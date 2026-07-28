@@ -1,0 +1,6 @@
+{
+  "room": ["available", "occupied", "maintenance"],
+  "contract": ["active", "expired", "cancelled"],
+  "billing": ["draft", "unpaid", "paid", "cancelled"],
+  "user": ["active", "inactive"]
+}
