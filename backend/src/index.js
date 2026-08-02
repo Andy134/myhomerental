@@ -50,13 +50,37 @@ if (require.main === module) {
     })
 }
 
-// Serverless (Vercel): cache kết nối MongoDB qua global để tái sử dụng
-const cached = global.mongooseCache
-if (!cached) {
-  global.mongooseCache = mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB (serverless)'))
-    .catch(err => console.error('MongoDB connection error:', err.message))
+// Serverless (Vercel): cache kết nối MongoDB qua global để tái sử dụng.
+// - serverSelectionTimeoutMS giảm từ 30s xuống 8s (dưới giới hạn 10s của Vercel Hobby)
+// - bufferCommands: false → query không bị treo chờ (buffering timed out) khi chưa có kết nối
+// - Nếu kết nối thất bại, xóa cache để lần gọi sau tự retry (tránh cache promise lỗi vĩnh viễn)
+function connectDB() {
+  if (global.mongooseCache) return global.mongooseCache
+  global.mongooseCache = mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 8000,
+    connectTimeoutMS: 8000,
+    bufferCommands: false
+  })
+    .then(() => {
+      console.log('Connected to MongoDB (serverless)')
+      return mongoose.connection
+    })
+    .catch(err => {
+      console.error('MongoDB connection error:', err.message)
+      delete global.mongooseCache
+      throw err
+    })
+  return global.mongooseCache
 }
 
-module.exports = app
+// Export async handler: đảm bảo MongoDB đã kết nối trước khi xử lý request.
+// Tránh lỗi "Operation ... buffering timed out" khi request đến lúc connect chưa xong.
+module.exports = async (req, res) => {
+  try {
+    await connectDB()
+  } catch (err) {
+    return res.status(500).json({ message: `Database connection failed: ${err.message}` })
+  }
+  return app(req, res)
+}
 

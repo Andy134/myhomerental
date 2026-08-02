@@ -45,11 +45,11 @@
               <!-- Billing Details Table -->
               <table class="table table-borderless mb-0">
                 <tbody>
-                  <tr>
+                  <tr v-if="(billing.room_price || 0) > 0">
                     <td class="ps-0 text-muted">Tiền phòng</td>
                     <td class="text-end fw-bold">{{ formatCurrency(billing.room_price) }}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="electricFee(billing) > 0">
                     <td class="ps-0 text-muted">
                       Điện ({{ billing.old_electric || 0 }} → {{ billing.new_electric || 0 }})
                       <small class="d-block text-muted">
@@ -57,24 +57,24 @@
                       </small>
                     </td>
                     <td class="text-end fw-bold">
-                      {{ formatCurrency(Math.max(0, (billing.new_electric || 0) - (billing.old_electric || 0)) * (billing.electric_price || 0)) }}
+                      {{ formatCurrency(electricFee(billing)) }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="waterFee(billing) > 0">
                     <td class="ps-0 text-muted">
                       Nước
                       <small class="d-block text-muted">{{ billing.number_of_members || 1 }} người × {{ formatCurrency(billing.water_price) }}/người</small>
                     </td>
-                    <td class="text-end fw-bold">{{ formatCurrency((billing.water_price || 0) * (billing.number_of_members || 1)) }}</td>
+                    <td class="text-end fw-bold">{{ formatCurrency(waterFee(billing)) }}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="serviceFee(billing) > 0">
                     <td class="ps-0 text-muted">
                       Phí dịch vụ
                       <small class="d-block text-muted">{{ billing.number_of_members || 1 }} người × {{ formatCurrency(billing.service_fee) }}/người</small>
                     </td>
-                    <td class="text-end fw-bold">{{ formatCurrency((billing.service_fee || 0) * (billing.number_of_members || 1)) }}</td>
+                    <td class="text-end fw-bold">{{ formatCurrency(serviceFee(billing)) }}</td>
                   </tr>
-                  <tr class="border-top">
+                  <tr :class="hasAnyItem(billing) ? 'border-top' : 'border-0'">
                     <td class="ps-0 pt-3">
                       <strong class="fs-5">TỔNG CỘNG</strong>
                     </td>
@@ -128,10 +128,25 @@ const route = useRoute()
 const billing = ref(null)
 const loading = ref(true)
 const error = ref('')
-const window = window
 
 function formatCurrency(v) {
   return (v || 0).toLocaleString('vi-VN') + ' đ'
+}
+
+function electricFee(b) {
+  return Math.max(0, (b.new_electric || 0) - (b.old_electric || 0)) * (b.electric_price || 0)
+}
+
+function waterFee(b) {
+  return (b.water_price || 0) * (b.number_of_members || 1)
+}
+
+function serviceFee(b) {
+  return (b.service_fee || 0) * (b.number_of_members || 1)
+}
+
+function hasAnyItem(b) {
+  return (b.room_price || 0) > 0 || electricFee(b) > 0 || waterFee(b) > 0 || serviceFee(b) > 0
 }
 
 function formatMonth(m) {

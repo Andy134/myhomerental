@@ -1,3 +1,11 @@
+# Git / Branch
+
+Làm việc trên nhánh `develop`.
+
+Chỉ push nhánh `develop` lên remote sau khi test local OK.
+
+Merge `develop` vào `master` để deploy.
+
 # Authentication
 Username/Password: get from file
 tạo 1 file adm.json lưu thông tin truy cập của admin

@@ -18,6 +18,14 @@ Không giả định.
 
 ## Coding
 
+Làm việc trên nhánh `develop`.
+
+Trước khi code, kiểm tra đang ở nhánh `develop` (không code trực tiếp trên `master`).
+
+Chỉ push nhánh `develop` sau khi test local OK.
+
+Merge `develop` vào `master` để deploy.
+
 Code phải clean.
 
 Không duplicate code.

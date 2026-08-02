@@ -265,26 +265,26 @@
               <hr />
               <table class="table table-borderless mb-0">
                 <tbody>
-                  <tr>
+                  <tr v-if="(printTarget?.room_price || 0) > 0">
                     <td class="ps-0 text-muted">Tiền phòng</td>
                     <td class="text-end fw-bold">{{ formatCurrency(printTarget?.room_price) }}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="electricFee(printTarget) > 0">
                     <td class="ps-0 text-muted">
                       Điện ({{ printTarget?.old_electric || 0 }} → {{ printTarget?.new_electric || 0 }})
                       <small class="d-block text-muted">{{ Math.max(0, (printTarget?.new_electric || 0) - (printTarget?.old_electric || 0)) }} kWh × {{ formatCurrency(printTarget?.electric_price) }}/kWh</small>
                     </td>
-                    <td class="text-end fw-bold">{{ formatCurrency(Math.max(0, (printTarget?.new_electric || 0) - (printTarget?.old_electric || 0)) * (printTarget?.electric_price || 0)) }}</td>
+                    <td class="text-end fw-bold">{{ formatCurrency(electricFee(printTarget)) }}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="waterFee(printTarget) > 0">
                     <td class="ps-0 text-muted">Nước <small class="d-block text-muted">{{ printTarget?.number_of_members || 1 }} người × {{ formatCurrency(printTarget?.water_price) }}/người</small></td>
-                    <td class="text-end fw-bold">{{ formatCurrency((printTarget?.water_price || 0) * (printTarget?.number_of_members || 1)) }}</td>
+                    <td class="text-end fw-bold">{{ formatCurrency(waterFee(printTarget)) }}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="serviceFee(printTarget) > 0">
                     <td class="ps-0 text-muted">Phí dịch vụ <small class="d-block text-muted">{{ printTarget?.number_of_members || 1 }} người × {{ formatCurrency(printTarget?.service_fee) }}/người</small></td>
-                    <td class="text-end fw-bold">{{ formatCurrency((printTarget?.service_fee || 0) * (printTarget?.number_of_members || 1)) }}</td>
+                    <td class="text-end fw-bold">{{ formatCurrency(serviceFee(printTarget)) }}</td>
                   </tr>
-                  <tr class="border-top">
+                  <tr :class="hasAnyItem(printTarget) ? 'border-top' : 'border-0'">
                     <td class="ps-0 pt-3"><strong class="fs-5">TỔNG CỘNG</strong></td>
                     <td class="text-end pt-3"><strong class="fs-5 text-primary">{{ formatCurrency(printTarget?.total_price) }}</strong></td>
                   </tr>
@@ -395,6 +395,22 @@ const printUrlInput = ref(null)
 const shareUrlInput = ref(null)
 
 function formatCurrency(v) { return (v || 0).toLocaleString('vi-VN') + ' đ' }
+
+function electricFee(b) {
+  return Math.max(0, (b?.new_electric || 0) - (b?.old_electric || 0)) * (b?.electric_price || 0)
+}
+
+function waterFee(b) {
+  return (b?.water_price || 0) * (b?.number_of_members || 1)
+}
+
+function serviceFee(b) {
+  return (b?.service_fee || 0) * (b?.number_of_members || 1)
+}
+
+function hasAnyItem(b) {
+  return (b?.room_price || 0) > 0 || electricFee(b) > 0 || waterFee(b) > 0 || serviceFee(b) > 0
+}
 
 function computedTotals() {
   const totals = { old_electric: 0, new_electric: 0, number_of_members: 0, service_fee: 0, water_fee: 0, electric_fee: 0, total_price: 0 }
@@ -541,7 +557,10 @@ async function handleBulkDelete() {
 async function getShareUrl(b) {
   try {
     const res = await api.post(`/monthly-billings/${b._id}/share`)
-    return res.data.share_url
+    // Tự tạo link từ origin của frontend (http://localhost:5173 khi dev, domain Vercel khi production)
+    // Không dùng share_url từ backend vì qua Vite proxy Host header bị đổi thành localhost:3000
+    const token = res.data.share_token
+    return `${window.location.origin}/shared-billing/${token}`
   } catch (e) {
     alert(e.response?.data?.message || 'Lỗi khi tạo link chia sẻ')
     return null
