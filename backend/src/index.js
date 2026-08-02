@@ -35,15 +35,28 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Connect to MongoDB then start server
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB')
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
+// Chạy local (npm start / node src/index.js) → kết nối MongoDB + listen
+if (require.main === module) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('Connected to MongoDB')
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`)
+      })
     })
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err.message)
-    process.exit(1)
-  })
+    .catch(err => {
+      console.error('MongoDB connection error:', err.message)
+      process.exit(1)
+    })
+}
+
+// Serverless (Vercel): cache kết nối MongoDB qua global để tái sử dụng
+const cached = global.mongooseCache
+if (!cached) {
+  global.mongooseCache = mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB (serverless)'))
+    .catch(err => console.error('MongoDB connection error:', err.message))
+}
+
+module.exports = app
+
