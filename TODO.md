@@ -8,6 +8,6 @@
 - [x] **Step 2**: Thêm rule Git vào `docs/09-ai-guide.md`
 - [x] **Step 3**: Tạo nhánh `develop` trong git
 - [x] **Step 4**: Chuyển sang làm việc trên nhánh `develop`
-- [ ] **Step 5**: Push nhánh `develop` lên remote (sau khi test local OK)
-- [ ] **Step 6**: Merge `develop` vào `master` khi muốn deploy
+- [x] **Step 5**: Push nhánh `develop` lên remote (sau khi test local OK)
+- [x] **Step 6**: Merge `develop` vào `master` khi muốn deploy
 
