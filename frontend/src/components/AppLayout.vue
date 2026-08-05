@@ -41,10 +41,16 @@
             Hóa đơn
           </router-link>
         </li>
-        <li>
+<li>
           <router-link to="/expenses" class="nav-link text-white" :class="{ active: isActive('/expenses') }">
             <i class="bi bi-receipt me-2"></i>
             Chi phí
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/settings" class="nav-link text-white" :class="{ active: isActive('/settings') }">
+            <i class="bi bi-gear me-2"></i>
+            Cài đặt
           </router-link>
         </li>
       </ul>

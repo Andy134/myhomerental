@@ -1,13 +1,12 @@
-# Git Workflow: Làm việc trên nhánh `develop`
+# Task: Màn hình Cài đặt - Tài khoản thanh toán
 
-> Quy tắc coding: làm việc trên nhánh `develop`; test local OK mới push `develop`; merge `develop` vào `master` để deploy.
+## Các bước thực hiện
 
-## Các bước
-
-- [x] **Step 1**: Thêm rule Git vào `docs/06-rules.md`
-- [x] **Step 2**: Thêm rule Git vào `docs/09-ai-guide.md`
-- [x] **Step 3**: Tạo nhánh `develop` trong git
-- [x] **Step 4**: Chuyển sang làm việc trên nhánh `develop`
-- [ ] **Step 5**: Push nhánh `develop` lên remote (sau khi test local OK)
-- [ ] **Step 6**: Merge `develop` vào `master` khi muốn deploy
-
+- [x] 1. Tạo model `backend/src/models/setting.js` (singleton chứa payment_qr, account_number, account_name, bank_name)
+- [x] 2. Tạo route `backend/src/routes/settings.js` (GET/PUT, có auth)
+- [x] 3. Đăng ký route settings trong `backend/src/index.js`
+- [x] 4. Thêm `GET /api/public/settings` trong `backend/src/routes/public.js`
+- [x] 5. Tạo view `frontend/src/views/Settings.vue` (upload QR, form tài khoản thanh toán)
+- [x] 6. Thêm route `/settings` trong `frontend/src/router/index.js`
+- [x] 7. Thêm menu "Cài đặt" trong `frontend/src/components/AppLayout.vue`
+- [x] 8. Hiển thị thông tin thanh toán trong `frontend/src/views/SharedBilling.vue`

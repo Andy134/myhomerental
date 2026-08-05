@@ -6,6 +6,7 @@ import Users from '../views/Users.vue'
 import Contracts from '../views/Contracts.vue'
 import MonthlyBilling from '../views/MonthlyBilling.vue'
 import Expenses from '../views/Expenses.vue'
+import Settings from '../views/Settings.vue'
 
 const routes = [
   {
@@ -51,6 +52,12 @@ const routes = [
     path: '/expenses',
     name: 'Expenses',
     component: Expenses,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: { requiresAuth: true }
   },
   {

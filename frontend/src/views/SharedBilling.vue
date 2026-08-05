@@ -103,6 +103,44 @@
             </div>
           </div>
 
+<!-- Payment Info -->
+          <div v-if="hasPaymentInfo" class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+              <h5 class="fw-bold mb-0">
+                <i class="bi bi-credit-card me-2"></i>Thông tin thanh toán
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row align-items-center g-3">
+                <div class="col-auto" v-if="paymentInfo.payment_qr">
+                  <img :src="paymentInfo.payment_qr" alt="Mã QR thanh toán" class="payment-qr" />
+                </div>
+                <div class="col">
+                  <table class="table table-borderless mb-0">
+                    <tbody>
+                      <tr v-if="paymentInfo.payment_bank_name">
+                        <td class="ps-0 text-muted" style="width: 140px;">Ngân hàng</td>
+                        <td class="fw-semibold">{{ paymentInfo.payment_bank_name }}</td>
+                      </tr>
+                      <tr v-if="paymentInfo.payment_account_number">
+                        <td class="ps-0 text-muted">Số tài khoản</td>
+                        <td class="fw-bold">{{ paymentInfo.payment_account_number }}</td>
+                      </tr>
+                      <tr v-if="paymentInfo.payment_account_name">
+                        <td class="ps-0 text-muted">Tên người nhận</td>
+                        <td class="fw-semibold">{{ paymentInfo.payment_account_name }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <small class="text-muted d-block mt-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Vui lòng chuyển khoản đúng số tiền trong hóa đơn và ghi rõ nội dung chuyển khoản.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Footer -->
           <div class="text-center mt-4">
             <p class="text-muted small mb-0">
@@ -120,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
@@ -128,6 +166,13 @@ const route = useRoute()
 const billing = ref(null)
 const loading = ref(true)
 const error = ref('')
+
+const paymentInfo = ref({ payment_qr: '', payment_account_number: '', payment_account_name: '', payment_bank_name: '' })
+
+const hasPaymentInfo = computed(() => {
+  const p = paymentInfo.value
+  return !!(p.payment_qr || p.payment_account_number || p.payment_account_name || p.payment_bank_name)
+})
 
 function formatCurrency(v) {
   return (v || 0).toLocaleString('vi-VN') + ' đ'
@@ -172,6 +217,14 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+
+  // Lấy thông tin thanh toán công khai (không cần bắt buộc thành công)
+  try {
+    const res = await axios.get('/api/public/settings')
+    paymentInfo.value = res.data || paymentInfo.value
+  } catch (e) {
+    console.error('Failed to load payment settings:', e)
+  }
 })
 </script>
 
@@ -179,6 +232,16 @@ onMounted(async () => {
 .shared-billing-container {
   min-height: 100vh;
   background-color: #f5f6fa;
+}
+
+.payment-qr {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 4px;
+  background: #fff;
 }
 </style>
 
