@@ -11,11 +11,13 @@ const settingSchema = new mongoose.Schema({
     unique: true,
     default: 'app'
   },
-  // Tài khoản thanh toán
+// Tài khoản thanh toán
   payment_qr:            { type: String, default: '' },  // base64 data URL của mã QR
   payment_account_number:{ type: String, default: '' },  // số tài khoản
   payment_account_name:  { type: String, default: '' },  // tên người nhận
-  payment_bank_name:     { type: String, default: '' }   // tên ngân hàng
+  payment_bank_name:     { type: String, default: '' },  // tên ngân hàng
+  // Mẫu hợp đồng (HTML của WYSIWYG editor)
+  contract_template:     { type: String, default: '' }   // template hợp đồng thuê phòng
 }, {
   timestamps: true
 })

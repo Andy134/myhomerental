@@ -39,9 +39,12 @@
               <td>
                 <span class="badge" :class="statusBadge(c.status)">{{ statusLabel(c.status) }}</span>
               </td>
-              <td class="text-center">
+<td class="text-center">
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(c)">
                   <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info me-1" title="Soạn hợp đồng" @click="openContractPrint(c)">
+                  <i class="bi bi-printer"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger" title="Xóa" @click="confirmDelete(c)">
                   <i class="bi bi-trash"></i>
@@ -160,10 +163,35 @@
           <div class="modal-body">
             Bạn có chắc muốn xóa hợp đồng <strong>{{ deleteTarget?.code }}</strong>?
           </div>
-          <div class="modal-footer border-0">
+<div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
             <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
               {{ deleting ? 'Đang xóa...' : 'Xóa' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Print Modal -->
+    <div class="modal fade" id="contractPrintModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Soạn hợp đồng - {{ printTarget?.code }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="!template" class="text-center py-4 text-muted">
+              <i class="bi bi-exclamation-triangle fs-2 d-block mb-2"></i>
+              Chưa có mẫu hợp đồng. Vui lòng vào <router-link to="/settings">Cài đặt</router-link> để soạn mẫu hợp đồng trước.
+            </div>
+            <div v-else class="contract-print-preview" id="contract-content" v-html="renderedContent"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary" @click="handlePrintContract" :disabled="!template">
+              <i class="bi bi-printer me-1"></i>In hợp đồng
             </button>
           </div>
         </div>
@@ -173,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
 import MoneyInput from '../components/MoneyInput.vue'
@@ -188,6 +216,11 @@ const deleting = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
 const deleteTarget = ref(null)
+
+// Print contract state
+const template = ref('')
+const printTarget = ref(null)
+let contractPrintModal = null
 
 const defaultForm = {
   code: '', room_id: '', room_no: '', user_id: '',
@@ -205,14 +238,53 @@ function formatDate(d) {
 function statusLabel(s) { return { active: 'Đang hiệu lực', expired: 'Hết hạn', cancelled: 'Đã hủy' }[s] || s }
 function statusBadge(s) { return { active: 'bg-success', expired: 'bg-secondary', cancelled: 'bg-danger' }[s] || 'bg-secondary' }
 
+// Map dữ liệu hợp đồng để thay thế các biến (placeholder) trong mẫu
+function contractData(c) {
+  return {
+    code: c.code,
+    room_no: c.room_no,
+    user_name: c.user_id?.name || '--',
+    user_phone: c.user_id?.phone || '',
+    deposit: formatCurrency(c.predict_price),
+    start_date: formatDate(c.start_date),
+    end_date: formatDate(c.end_date),
+    room_price: formatCurrency(c.price),
+    electric_price: formatCurrency(c.electric_price),
+    water_price: formatCurrency(c.water_price),
+    service_fee: formatCurrency(c.service_fee),
+    number_of_members: c.number_of_members || 1
+  }
+}
+
+// Nội dung hợp đồng sau khi thay thế biến
+const renderedContent = computed(() => {
+  if (!template.value || !printTarget.value) return ''
+  let html = template.value
+  const data = contractData(printTarget.value)
+  Object.keys(data).forEach(k => {
+    html = html.split('{{' + k + '}}').join(String(data[k]))
+  })
+  return html
+})
+
 let contractModal = null
 let deleteModal = null
 
 onMounted(async () => {
-  await Promise.all([loadContracts(), loadRooms(), loadUsers()])
+  await Promise.all([loadContracts(), loadRooms(), loadUsers(), loadTemplate()])
   contractModal = new Modal(document.getElementById('contractModal'))
   deleteModal = new Modal(document.getElementById('deleteModal'))
+  contractPrintModal = new Modal(document.getElementById('contractPrintModal'))
 })
+
+async function loadTemplate() {
+  try {
+    const res = await api.get('/settings')
+    template.value = res.data.contract_template || ''
+  } catch (e) {
+    console.error('Load contract template failed:', e)
+  }
+}
 
 async function loadContracts() {
   try { contracts.value = (await api.get('/contracts')).data }
@@ -282,5 +354,51 @@ async function handleDelete() {
   } catch (e) { alert(e.response?.data?.message || 'Lỗi khi xóa') }
   finally { deleting.value = false }
 }
+
+function openContractPrint(c) {
+  printTarget.value = c
+  contractPrintModal.show()
+}
+
+function handlePrintContract() {
+  const content = document.getElementById('contract-content')
+  if (!content) return
+
+  const printWindow = window.open('', '_blank', 'width=800,height=600')
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Hợp đồng thuê phòng - ${printTarget.value?.code || ''}</title>
+      <style>
+        body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+        @media print { body { padding: 20px; } }
+      </style>
+    </head>
+    <body>
+      ${content.innerHTML}
+    </body>
+    </html>
+  `)
+  printWindow.document.close()
+  printWindow.focus()
+
+// Chờ render xong rồi in
+  setTimeout(() => {
+    printWindow.print()
+  }, 500)
+}
 </script>
+
+<style scoped>
+.contract-print-preview {
+  font-family: 'Times New Roman', serif;
+  line-height: 1.6;
+}
+
+.contract-print-preview :deep(h1),
+.contract-print-preview :deep(h2) {
+  text-align: center;
+}
+</style>
 

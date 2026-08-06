@@ -31,7 +31,7 @@ router.put('/', authenticate, async (req, res) => {
   try {
     const doc = await getSettingsDoc()
 
-    const fields = ['payment_qr', 'payment_account_number', 'payment_account_name', 'payment_bank_name']
+const fields = ['payment_qr', 'payment_account_number', 'payment_account_name', 'payment_bank_name', 'contract_template']
 
     // Chỉ cập nhật các trường được gửi lên
     fields.forEach(f => {

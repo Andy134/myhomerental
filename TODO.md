@@ -1,19 +1,13 @@
-# Plan: Code fix màn hình theo rule Date picker & Money auto-format
+# TODO - Tính năng soạn hợp đồng WYSIWYG
 
-> Quy tắc coding: làm việc trên nhánh `develop`; test local OK mới push `develop`; merge `develop` vào `master` khi được chủ dự án xác nhận.
+## Steps
+- [x] 1. Backend: Thêm trường `contract_template` vào model `setting.js`
+- [x] 2. Backend: Thêm `contract_template` vào fields cập nhật trong route `settings.js`
+- [x] 3. Frontend: Tạo component WYSIWYG `RichTextEditor.vue`
+- [x] 4. Frontend: Thêm card "Soạn hợp đồng" vào màn hình `Settings.vue`
+- [x] 5. Frontend: Thêm nút "Soạn hợp đồng" + modal xem trước/in trong `Contracts.vue`
+- [x] 6. Frontend: Làm 2 card cài đặt ("Tài khoản thanh toán", "Soạn mẫu hợp đồng") có thể thu gọn (collapse), mặc định thu gọn
+- [ ] 7. Push nhánh develop lên remote
 
-## Các bước
-
-- [x] **Step 1**: Thêm rule Git vào `docs/06-rules.md`
-- [x] **Step 2**: Bổ sung rule Datetime (date picker) & Tiền (auto-format) vào `docs/06-rules.md`
-- [x] **Step 3**: Chuyển sang nhánh `develop`
-- [x] **Step 4**: Tạo helper `frontend/src/services/format.js`
-- [x] **Step 5**: Tạo component `MoneyInput.vue` (auto ngăn cách tiền khi nhập)
-- [x] **Step 6**: Tạo component `DatePicker.vue` (chuyển đổi ddmmyyyy ↔ yyyy-mm-dd)
-- [x] **Step 7**: Áp dụng vào `Expenses.vue` (date picker + money input)
-- [x] **Step 8**: Áp dụng vào `Contracts.vue` (date picker + money input)
-- [x] **Step 9**: Áp dụng vào `Rooms.vue` (money input)
-- [x] **Step 10**: Áp dụng vào `MonthlyBilling.vue` (money input)
-- [x] **Step 11**: Build frontend test local OK
-- [ ] **Step 12**: Push `develop` lên remote (sau khi test OK)
-- [ ] **Step 13**: Merge `develop` vào `master` (khi được xác nhận)
+## Test
+- [x] Xác nhận frontend build thành công (`npm run build`)
