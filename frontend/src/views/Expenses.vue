@@ -55,10 +55,9 @@
           </div>
           <form @submit.prevent="handleSave">
             <div class="modal-body">
-              <div class="mb-3">
+<div class="mb-3">
                 <label class="form-label fw-semibold">Ngày <span class="text-danger">*</span></label>
-                <input v-model="form.date" class="form-control" required placeholder="ddmmyyyy" maxlength="8" />
-                <small class="text-muted">Định dạng: DDMMYYYY (VD: 01012024)</small>
+                <DatePicker v-model="form.date" required />
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Mô tả <span class="text-danger">*</span></label>
@@ -66,7 +65,7 @@
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Số tiền <span class="text-danger">*</span></label>
-                <input v-model.number="form.amount" type="number" class="form-control" required min="0" />
+                <MoneyInput v-model="form.amount" required />
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Ghi chú</label>
@@ -111,6 +110,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
+import MoneyInput from '../components/MoneyInput.vue'
+import DatePicker from '../components/DatePicker.vue'
 import api from '../services/api.js'
 
 const expenses = ref([])

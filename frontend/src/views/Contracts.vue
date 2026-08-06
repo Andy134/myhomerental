@@ -84,21 +84,19 @@
                     <option v-for="u in users" :key="u._id" :value="u._id">{{ u.name }} - {{ u.phone }}</option>
                   </select>
                 </div>
-                <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Tiền cọc</label>
-                  <input v-model.number="form.predict_price" type="number" class="form-control" min="0" />
+                  <MoneyInput v-model="form.predict_price" />
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Ngày bắt đầu <span class="text-danger">*</span></label>
-                  <input v-model="form.start_date" class="form-control" required placeholder="ddmmyyyy" maxlength="8" />
-                  <small class="text-muted">Định dạng: DDMMYYYY (VD: 01012024)</small>
+                  <DatePicker v-model="form.start_date" required />
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Ngày kết thúc <span class="text-danger">*</span></label>
-                  <input v-model="form.end_date" class="form-control" required placeholder="ddmmyyyy" maxlength="8" />
-                  <small class="text-muted">Định dạng: DDMMYYYY (VD: 31122024)</small>
+                  <DatePicker v-model="form.end_date" required />
                 </div>
               </div>
               <div class="row">
@@ -106,23 +104,23 @@
                   <label class="form-label fw-semibold">Số người ở</label>
                   <input v-model.number="form.number_of_members" type="number" class="form-control" min="1" />
                 </div>
-                <div class="col-md-4 mb-3">
+<div class="col-md-4 mb-3">
                   <label class="form-label fw-semibold">Giá phòng</label>
-                  <input v-model.number="form.price" type="number" class="form-control" readonly />
+                  <MoneyInput v-model="form.price" readonly />
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label fw-semibold">Đơn giá điện (kWh)</label>
-                  <input v-model.number="form.electric_price" type="number" class="form-control" min="0" />
+                  <MoneyInput v-model="form.electric_price" />
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Đơn giá nước (người)</label>
-                  <input v-model.number="form.water_price" type="number" class="form-control" min="0" />
+                  <MoneyInput v-model="form.water_price" />
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Phí dịch vụ (người)</label>
-                  <input v-model.number="form.service_fee" type="number" class="form-control" min="0" />
+                  <MoneyInput v-model="form.service_fee" />
                 </div>
               </div>
               <div class="row">
@@ -178,6 +176,8 @@
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
+import MoneyInput from '../components/MoneyInput.vue'
+import DatePicker from '../components/DatePicker.vue'
 import api from '../services/api.js'
 
 const contracts = ref([])

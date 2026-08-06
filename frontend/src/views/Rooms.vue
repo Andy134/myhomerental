@@ -75,9 +75,9 @@
                 <label class="form-label fw-semibold">Thông tin</label>
                 <textarea v-model="form.info" class="form-control" rows="2" placeholder="Mô tả phòng"></textarea>
               </div>
-              <div class="mb-3">
+<div class="mb-3">
                 <label class="form-label fw-semibold">Giá <span class="text-danger">*</span></label>
-                <input v-model.number="form.price" type="number" class="form-control" required min="0" />
+                <MoneyInput v-model="form.price" required />
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Trạng thái</label>
@@ -130,6 +130,7 @@
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
+import MoneyInput from '../components/MoneyInput.vue'
 import api from '../services/api.js'
 
 const rooms = ref([])
