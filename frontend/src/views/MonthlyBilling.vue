@@ -148,22 +148,22 @@
                 </div>
                 <div class="col-6 mb-3">
                   <label class="form-label fw-semibold">Phí dịch vụ</label>
-                  <input v-model.number="editForm.service_fee" type="number" class="form-control" min="0" @input="calcTotal" />
+                  <MoneyInput v-model="editForm.service_fee" @input="calcTotal" />
                 </div>
               </div>
               <div class="row">
                 <div class="col-6 mb-3">
                   <label class="form-label fw-semibold">Đơn giá điện (đ/kWh)</label>
-                  <input v-model.number="editForm.electric_price" type="number" class="form-control" min="0" @input="calcTotal" />
+                  <MoneyInput v-model="editForm.electric_price" @input="calcTotal" />
                 </div>
                 <div class="col-6 mb-3">
                   <label class="form-label fw-semibold">Đơn giá nước (đ/người)</label>
-                  <input v-model.number="editForm.water_price" type="number" class="form-control" min="0" @input="calcTotal" />
+                  <MoneyInput v-model="editForm.water_price" @input="calcTotal" />
                 </div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Tổng tiền</label>
-                <input v-model.number="editForm.total_price" type="number" class="form-control fw-bold" min="0" />
+                <MoneyInput v-model="editForm.total_price" align-right="false" />
                 <small class="text-muted">Tự động tính: tiền phòng + (điện mới - cũ)*đơn giá điện + phí dịch vụ*người + tiền nước*người</small>
               </div>
               <div class="row">
@@ -365,6 +365,7 @@
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
+import MoneyInput from '../components/MoneyInput.vue'
 import api from '../services/api.js'
 
 const billings = ref([])
