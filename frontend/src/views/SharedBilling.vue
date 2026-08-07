@@ -147,9 +147,6 @@
               <i class="bi bi-info-circle me-1"></i>
               Hóa đơn được tạo bởi hệ thống quản lý nhà trọ HomeRental
             </p>
-            <button class="btn btn-outline-primary mt-2" @click="window.print()">
-              <i class="bi bi-printer me-1"></i>In phiếu thu
-            </button>
           </div>
         </div>
       </div>
