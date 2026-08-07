@@ -73,8 +73,9 @@
               </div>
 
 <div class="mt-4">
-                <button type="submit" class="btn btn-primary" :disabled="saving">
-                  <i class="bi bi-check-lg me-1"></i>
+<button type="submit" class="btn btn-primary" :disabled="saving">
+                  <span v-if="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  <i v-else class="bi bi-check-lg me-1"></i>
                   {{ saving ? 'Đang lưu...' : 'Lưu cài đặt' }}
                 </button>
               </div>
@@ -125,8 +126,9 @@
               </div>
 
               <div>
-                <button type="button" class="btn btn-primary" @click="saveContractTemplate" :disabled="savingTemplate">
-                  <i class="bi bi-check-lg me-1"></i>
+<button type="button" class="btn btn-primary" @click="saveContractTemplate" :disabled="savingTemplate">
+                  <span v-if="savingTemplate" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  <i v-else class="bi bi-check-lg me-1"></i>
                   {{ savingTemplate ? 'Đang lưu...' : 'Lưu mẫu hợp đồng' }}
                 </button>
               </div>

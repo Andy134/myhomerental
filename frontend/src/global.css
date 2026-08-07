@@ -1,0 +1,17 @@
+/* ============================================================
+   Global CSS overrides
+   ============================================================ */
+
+/* Fix Bootstrap buttons:
+   - Không cho text xuống dòng làm tăng chiều cao
+   - Không cố định chiều rộng (width: auto)
+   - Flex layout để icon + text thẳng hàng đẹp
+   ============================================================ */
+.btn {
+  white-space: nowrap;   /* Ngăn text xuống dòng */
+  width: auto;           /* Không cố định chiều rộng */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}

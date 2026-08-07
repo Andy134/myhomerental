@@ -22,8 +22,16 @@
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-if="contracts.length === 0">
+<tbody>
+<tr v-if="loading">
+              <td colspan="8" class="text-center py-5 text-muted">
+                <div class="spinner-border text-primary mb-2" role="status">
+                  <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <div>Đang tải dữ liệu...</div>
+              </td>
+            </tr>
+            <tr v-else-if="contracts.length === 0">
               <td colspan="8" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có hợp đồng nào
@@ -143,7 +151,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
+<button type="submit" class="btn btn-primary" :disabled="saving">
+                <span v-if="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                 {{ saving ? 'Đang lưu...' : 'Lưu' }}
               </button>
             </div>
@@ -165,7 +174,8 @@
           </div>
 <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+<button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ deleting ? 'Đang xóa...' : 'Xóa' }}
             </button>
           </div>
@@ -211,6 +221,7 @@ import api from '../services/api.js'
 const contracts = ref([])
 const rooms = ref([])
 const users = ref([])
+const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
 const isEditing = ref(false)
@@ -287,8 +298,10 @@ async function loadTemplate() {
 }
 
 async function loadContracts() {
+  loading.value = true
   try { contracts.value = (await api.get('/contracts')).data }
   catch (e) { console.error(e) }
+  finally { loading.value = false }
 }
 async function loadRooms() {
   try { rooms.value = (await api.get('/rooms')).data }

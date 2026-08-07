@@ -37,8 +37,16 @@
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-if="billings.length === 0">
+<tbody>
+            <tr v-if="loading">
+              <td colspan="13" class="text-center py-5 text-muted">
+                <div class="spinner-border text-primary mb-2" role="status">
+                  <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <div>Đang tải dữ liệu...</div>
+              </td>
+            </tr>
+            <tr v-else-if="billings.length === 0">
               <td colspan="13" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có hóa đơn nào. Chọn tháng và nhấn "Tạo dữ liệu"
@@ -63,11 +71,13 @@
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(b)">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-info me-1" title="In phiếu thu" @click="handlePrint(b)">
-                  <i class="bi bi-printer"></i>
+<button class="btn btn-sm btn-outline-info me-1" title="In phiếu thu" @click="handlePrint(b)" :disabled="sharingId === b._id">
+                  <span v-if="sharingId === b._id" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  <i v-else class="bi bi-printer"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-success me-1" title="Chia sẻ" @click="handleShare(b)">
-                  <i class="bi bi-share"></i>
+                <button class="btn btn-sm btn-outline-success me-1" title="Chia sẻ" @click="handleShare(b)" :disabled="sharingId === b._id">
+                  <span v-if="sharingId === b._id" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  <i v-else class="bi bi-share"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger" title="Xóa" @click="confirmDelete(b)">
                   <i class="bi bi-trash"></i>
@@ -113,7 +123,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-success" @click="handleGenerate" :disabled="generating">
+<button type="button" class="btn btn-success" @click="handleGenerate" :disabled="generating">
+              <span v-if="generating" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ generating ? 'Đang tạo...' : 'Tạo' }}
             </button>
           </div>
@@ -184,7 +195,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
+<button type="submit" class="btn btn-primary" :disabled="saving">
+                <span v-if="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                 {{ saving ? 'Đang lưu...' : 'Lưu' }}
               </button>
             </div>
@@ -206,7 +218,8 @@
           </div>
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+<button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ deleting ? 'Đang xóa...' : 'Xóa' }}
             </button>
           </div>
@@ -228,7 +241,8 @@
           </div>
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-danger" @click="handleBulkDelete" :disabled="bulkDeleting">
+<button type="button" class="btn btn-danger" @click="handleBulkDelete" :disabled="bulkDeleting">
+              <span v-if="bulkDeleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ bulkDeleting ? 'Đang xóa...' : 'Xóa tất cả' }}
             </button>
           </div>
@@ -370,10 +384,12 @@ import api from '../services/api.js'
 
 const billings = ref([])
 const selectedMonth = ref('')
+const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
 const generating = ref(false)
 const bulkDeleting = ref(false)
+const sharingId = ref(null)
 const generateMonth = ref('')
 const generateForce = ref(false)
 const editTarget = ref(null)
@@ -467,8 +483,10 @@ onMounted(() => {
 async function loadBillings() {
   if (!selectedMonth.value) return
   const month = selectedMonth.value.replace('-', '')
+  loading.value = true
   try { billings.value = (await api.get(`/monthly-billings?month=${month}`)).data }
   catch (e) { console.error(e) }
+  finally { loading.value = false }
 }
 
 function openGenerateModal() {
@@ -604,11 +622,16 @@ async function copyToClipboard(text, inputRef) {
 }
 
 async function handlePrint(b) {
-  const url = await getShareUrl(b)
-  if (!url) return
-  printTarget.value = b
-  printShareUrl.value = url
-  printModal.show()
+  sharingId.value = b._id
+  try {
+    const url = await getShareUrl(b)
+    if (!url) return
+    printTarget.value = b
+    printShareUrl.value = url
+    printModal.show()
+  } finally {
+    sharingId.value = null
+  }
 }
 
 function handlePrintReceipt() {
@@ -674,11 +697,16 @@ function copyPrintUrl() {
 }
 
 async function handleShare(b) {
-  const url = await getShareUrl(b)
-  if (!url) return
-  shareTarget.value = b
-  shareUrl.value = url
-  shareModal.show()
+  sharingId.value = b._id
+  try {
+    const url = await getShareUrl(b)
+    if (!url) return
+    shareTarget.value = b
+    shareUrl.value = url
+    shareModal.show()
+  } finally {
+    sharingId.value = null
+  }
 }
 
 function copyShareUrl() {

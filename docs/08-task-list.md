@@ -29,7 +29,20 @@
 
 ---
 
-# Sprint 4 - Testing & Report
+# Sprint 4 - Tính năng bổ sung ✅
+
+- [x] Trang Settings (/settings): cài đặt tài khoản thanh toán (QR, số tài khoản, ngân hàng)
+- [x] Chia sẻ link hóa đơn: share_token + trang public /shared-billing/:token (SharedBilling.vue)
+- [x] WYSIWYG mẫu hợp đồng: RichTextEditor.vue + lưu contract_template vào Settings
+- [x] In/xem mẫu hợp đồng trong Contracts.vue
+- [x] Collapse/expand card cài đặt trong Settings.vue
+- [x] Reusable components: AppLayout, DatePicker, MoneyInput, RichTextEditor
+- [x] Format utilities: format.js (formatCurrency, formatDate, formatMonth, parseMoney, ...)
+- [x] Deploy Vercel (monorepo): vercel.json + serverless handler (xem vercel-deploy-guide.md)
+
+---
+
+# Sprint 5 - Testing & Report
 
 - [ ] Login UI testing
 - [ ] Dashboard testing
@@ -37,4 +50,5 @@
 - [ ] User management testing
 - [ ] Billing management testing
 - [ ] Expense management testing
-
+- [ ] Settings testing
+- [ ] Share billing link testing

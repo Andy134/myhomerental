@@ -26,8 +26,16 @@
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-if="rooms.length === 0">
+<tbody>
+            <tr v-if="loading">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <div class="spinner-border text-primary mb-2" role="status">
+                  <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <div>Đang tải dữ liệu...</div>
+              </td>
+            </tr>
+            <tr v-else-if="rooms.length === 0">
               <td colspan="6" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có phòng trọ nào
@@ -95,6 +103,7 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
               <button type="submit" class="btn btn-primary" :disabled="saving">
+                <span v-if="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                 {{ saving ? 'Đang lưu...' : 'Lưu' }}
               </button>
             </div>
@@ -117,6 +126,7 @@
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
             <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ deleting ? 'Đang xóa...' : 'Xóa' }}
             </button>
           </div>
@@ -134,6 +144,7 @@ import MoneyInput from '../components/MoneyInput.vue'
 import api from '../services/api.js'
 
 const rooms = ref([])
+const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
 const isEditing = ref(false)
@@ -157,8 +168,10 @@ onMounted(() => {
 })
 
 async function loadRooms() {
+  loading.value = true
   try { rooms.value = (await api.get('/rooms')).data }
   catch (e) { console.error(e) }
+  finally { loading.value = false }
 }
 
 function openAddModal() {

@@ -1,6 +1,6 @@
 <template>
   <AppLayout pageTitle="Tổng quan" pageSubtitle="Chào mừng trở lại!">
-    <!-- Stats Cards -->
+<!-- Stats Cards -->
     <div class="row g-4 mb-4">
       <div class="col-md-3">
         <div class="card border-0 shadow-sm stat-card">
@@ -8,7 +8,10 @@
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <p class="text-muted small mb-1">Tổng phòng</p>
-                <h3 class="fw-bold mb-0">{{ stats.totalRooms }}</h3>
+                <h3 class="fw-bold mb-0">
+                  <span v-if="loading" class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                  <template v-else>{{ stats.totalRooms }}</template>
+                </h3>
               </div>
               <div class="stat-icon bg-primary bg-opacity-10 text-primary rounded p-2">
                 <i class="bi bi-door-open fs-4"></i>
@@ -23,7 +26,10 @@
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <p class="text-muted small mb-1">Đang cho thuê</p>
-                <h3 class="fw-bold mb-0">{{ stats.occupiedRooms }}</h3>
+                <h3 class="fw-bold mb-0">
+                  <span v-if="loading" class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>
+                  <template v-else>{{ stats.occupiedRooms }}</template>
+                </h3>
               </div>
               <div class="stat-icon bg-success bg-opacity-10 text-success rounded p-2">
                 <i class="bi bi-person-check fs-4"></i>
@@ -38,7 +44,10 @@
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <p class="text-muted small mb-1">Phòng trống</p>
-                <h3 class="fw-bold mb-0">{{ stats.availableRooms }}</h3>
+                <h3 class="fw-bold mb-0">
+                  <span v-if="loading" class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true"></span>
+                  <template v-else>{{ stats.availableRooms }}</template>
+                </h3>
               </div>
               <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded p-2">
                 <i class="bi bi-house-x fs-4"></i>
@@ -53,7 +62,10 @@
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <p class="text-muted small mb-1">Doanh thu tháng</p>
-                <h3 class="fw-bold mb-0">{{ formatCurrency(stats.monthlyRevenue) }}</h3>
+                <h3 class="fw-bold mb-0">
+                  <span v-if="loading" class="spinner-border spinner-border-sm text-info" role="status" aria-hidden="true"></span>
+                  <template v-else>{{ formatCurrency(stats.monthlyRevenue) }}</template>
+                </h3>
               </div>
               <div class="stat-icon bg-info bg-opacity-10 text-info rounded p-2">
                 <i class="bi bi-cash-stack fs-4"></i>
@@ -125,6 +137,7 @@ const stats = ref({
 })
 const dueBillings = ref([])
 const chartData = ref(null)
+const loading = ref(false)
 
 const chartOptions = {
   responsive: true,
@@ -172,6 +185,7 @@ function aggregateByMonth(items, monthField, valueField) {
 }
 
 async function loadStats() {
+  loading.value = true
   try {
     const [roomsRes, contractsRes, billingsRes, expensesRes] = await Promise.all([
       api.get('/rooms'),
@@ -239,8 +253,10 @@ async function loadStats() {
         }
       ]
     }
-  } catch (err) {
+} catch (err) {
     console.error('Failed to load stats:', err)
+  } finally {
+    loading.value = false
   }
 }
 
