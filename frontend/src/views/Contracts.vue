@@ -251,9 +251,26 @@ function contractData(c) {
     room_price: formatCurrency(c.price),
     electric_price: formatCurrency(c.electric_price),
     water_price: formatCurrency(c.water_price),
-    service_fee: formatCurrency(c.service_fee),
-    number_of_members: c.number_of_members || 1
+service_fee: formatCurrency(c.service_fee),
+    number_of_members: c.number_of_members || 1,
+    // Biến ngày hiện tại (thay bằng ngày in hợp đồng)
+    current_date: todayStr(),
+    current_day: todayStr('dd'),
+    current_month: todayStr('mm'),
+    current_year: todayStr('yyyy')
   }
+}
+
+// Lấy ngày hiện tại theo định dạng yêu cầu
+function todayStr(fmt = 'dd-mm-yyyy') {
+  const now = new Date()
+  const dd = String(now.getDate()).padStart(2, '0')
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const yyyy = now.getFullYear()
+  if (fmt === 'dd') return dd
+  if (fmt === 'mm') return mm
+  if (fmt === 'yyyy') return String(yyyy)
+  return `${dd}-${mm}-${yyyy}`
 }
 
 // Nội dung hợp đồng sau khi thay thế biến

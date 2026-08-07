@@ -89,8 +89,12 @@ const defaultPlaceholders = [
   { value: '{{room_price}}', label: 'Giá phòng' },
   { value: '{{electric_price}}', label: 'Đơn giá điện' },
   { value: '{{water_price}}', label: 'Đơn giá nước' },
-  { value: '{{service_fee}}', label: 'Phí dịch vụ' },
-  { value: '{{number_of_members}}', label: 'Số người ở' }
+{ value: '{{service_fee}}', label: 'Phí dịch vụ' },
+  { value: '{{number_of_members}}', label: 'Số người ở' },
+  { value: '{{current_date}}', label: 'Ngày hiện tại (dd-mm-yyyy)' },
+  { value: '{{current_day}}', label: 'Ngày hiện tại (dd)' },
+  { value: '{{current_month}}', label: 'Ngày hiện tại (mm)' },
+  { value: '{{current_year}}', label: 'Ngày hiện tại (yyyy)' }
 ]
 
 const placeholders = computed(() => props.placeholders.length ? props.placeholders : defaultPlaceholders)
