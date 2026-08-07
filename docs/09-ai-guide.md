@@ -18,7 +18,7 @@ Không giả định.
 
 ## Coding
 
-Làm việc trên nhánh `develop`.
+Làm việc trên nhánh `develop`, không tạo nhanh mới.
 
 Trước khi code, kiểm tra đang ở nhánh `develop` (không code trực tiếp trên `master`).
 
