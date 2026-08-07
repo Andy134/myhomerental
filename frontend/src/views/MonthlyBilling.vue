@@ -71,8 +71,8 @@
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(b)">
                   <i class="bi bi-pencil"></i>
                 </button>
-<button class="btn btn-sm btn-outline-info me-1" title="In phiếu thu" @click="handlePrint(b)" :disabled="sharingId === b._id">
-                  <span v-if="sharingId === b._id" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                <button class="btn btn-sm btn-outline-info me-1" title="In phiếu thu" @click="handlePrint(b)" :disabled="printingId === b._id">
+                  <span v-if="printingId === b._id" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                   <i v-else class="bi bi-printer"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-success me-1" title="Chia sẻ" @click="handleShare(b)" :disabled="sharingId === b._id">
@@ -390,6 +390,7 @@ const deleting = ref(false)
 const generating = ref(false)
 const bulkDeleting = ref(false)
 const sharingId = ref(null)
+const printingId = ref(null)
 const generateMonth = ref('')
 const generateForce = ref(false)
 const editTarget = ref(null)
@@ -622,7 +623,7 @@ async function copyToClipboard(text, inputRef) {
 }
 
 async function handlePrint(b) {
-  sharingId.value = b._id
+  printingId.value = b._id
   try {
     const url = await getShareUrl(b)
     if (!url) return
@@ -630,7 +631,7 @@ async function handlePrint(b) {
     printShareUrl.value = url
     printModal.show()
   } finally {
-    sharingId.value = null
+    printingId.value = null
   }
 }
 
