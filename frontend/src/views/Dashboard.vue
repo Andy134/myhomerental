@@ -80,8 +80,9 @@
     <div class="row g-4">
       <div class="col-md-8">
         <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+          <div class="card-header bg-white border-bottom-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
             <h5 class="fw-bold mb-0">Doanh thu & Chi phí theo năm</h5>
+            <span class="text-muted small">Năm {{ currentYear }}</span>
           </div>
           <div class="card-body">
             <div class="chart-container" v-if="chartData">
@@ -90,6 +91,32 @@
             <div v-else class="text-center py-5 text-muted">
               <i class="bi bi-bar-chart fs-1 d-block mb-2"></i>
               <p class="mb-0">Đang tải dữ liệu...</p>
+            </div>
+            <!-- Annual Summary Stats -->
+            <div class="row g-3 mt-1">
+              <div class="col-4">
+                <div class="annual-stat-box bg-success bg-opacity-10 rounded-3 p-3 text-center">
+                  <p class="text-muted small mb-1"><i class="bi bi-arrow-up-circle-fill text-success me-1"></i>Tổng doanh thu</p>
+                  <p class="fw-bold text-success mb-0 fs-6">{{ formatCurrency(annualRevenue) }}</p>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="annual-stat-box bg-danger bg-opacity-10 rounded-3 p-3 text-center">
+                  <p class="text-muted small mb-1"><i class="bi bi-arrow-down-circle-fill text-danger me-1"></i>Tổng chi phí</p>
+                  <p class="fw-bold text-danger mb-0 fs-6">{{ formatCurrency(annualExpense) }}</p>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="annual-stat-box rounded-3 p-3 text-center"
+                     :class="annualProfit >= 0 ? 'bg-primary bg-opacity-10' : 'bg-warning bg-opacity-10'">
+                  <p class="text-muted small mb-1">
+                    <i class="bi me-1"
+                       :class="annualProfit >= 0 ? 'bi-graph-up-arrow text-primary' : 'bi-graph-down-arrow text-warning'"></i>Lợi nhuận ròng
+                  </p>
+                  <p class="fw-bold mb-0 fs-6"
+                     :class="annualProfit >= 0 ? 'text-primary' : 'text-warning'">{{ formatCurrency(annualProfit) }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -138,6 +165,10 @@ const stats = ref({
 const dueBillings = ref([])
 const chartData = ref(null)
 const loading = ref(false)
+const annualRevenue = ref(0)
+const annualExpense = ref(0)
+const annualProfit = ref(0)
+const currentYear = ref(new Date().getFullYear())
 
 const chartOptions = {
   responsive: true,
@@ -236,6 +267,11 @@ async function loadStats() {
       expenseData.push(expenseByMonth[i] || 0)
     }
 
+    // Annual totals
+    annualRevenue.value = revenueData.reduce((s, v) => s + v, 0)
+    annualExpense.value = expenseData.reduce((s, v) => s + v, 0)
+    annualProfit.value = annualRevenue.value - annualExpense.value
+
     chartData.value = {
       labels: monthLabels,
       datasets: [
@@ -293,7 +329,15 @@ onMounted(loadStats)
 
 .chart-container {
   position: relative;
-  height: 350px;
+  height: 320px;
+}
+
+.annual-stat-box {
+  transition: transform 0.15s;
+}
+
+.annual-stat-box:hover {
+  transform: translateY(-2px);
 }
 </style>
 

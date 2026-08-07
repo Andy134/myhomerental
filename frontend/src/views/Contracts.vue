@@ -251,6 +251,7 @@ function statusBadge(s) { return { active: 'bg-success', expired: 'bg-secondary'
 
 // Map dữ liệu hợp đồng để thay thế các biến (placeholder) trong mẫu
 function contractData(c) {
+  const now = new Date()
   return {
     code: c.code,
     room_no: c.room_no,
@@ -263,7 +264,10 @@ function contractData(c) {
     electric_price: formatCurrency(c.electric_price),
     water_price: formatCurrency(c.water_price),
     service_fee: formatCurrency(c.service_fee),
-    number_of_members: c.number_of_members || 1
+    number_of_members: c.number_of_members || 1,
+    current_day: String(now.getDate()).padStart(2, '0'),
+    current_month: String(now.getMonth() + 1).padStart(2, '0'),
+    current_year: now.getFullYear()
   }
 }
 
