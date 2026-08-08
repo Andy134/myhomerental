@@ -8,4 +8,4 @@ Commit toàn bộ thay đổi trên `develop`, merge vào `master` và deploy th
 - [x] 2. Push `develop` lên `origin/develop`.
 - [x] 3. Merge `develop` vào `master` local.
 - [x] 4. Push `master` lên `origin/master`.
-- [ ] 5. Deploy lên Vercel production & kiểm tra.
+- [x] 5. Deploy lên Vercel production & kiểm tra (Vercel Git Integration tự deploy khi đẩy master).
