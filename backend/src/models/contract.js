@@ -18,7 +18,10 @@ const contractSchema = new mongoose.Schema({
   water_price:   { type: Number, default: 0 },
   service_fee:   { type: Number, default: 0 },
   status:        { type: String, enum: status.contract, default: 'active' },
-  note:          { type: String, default: '' }
+  note:          { type: String, default: '' },
+  share_token:   { type: String, default: null, index: true, sparse: true },
+  tenant_signature: { type: String, default: '' },
+  tenant_signed_at: { type: Date, default: null }
 }, {
   timestamps: true
 })

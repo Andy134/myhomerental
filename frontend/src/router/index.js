@@ -65,6 +65,12 @@ const routes = [
     name: 'SharedBilling',
     component: () => import('../views/SharedBilling.vue'),
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/sign-contract/:token',
+    name: 'SignContract',
+    component: () => import('../views/SignContract.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 

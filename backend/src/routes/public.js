@@ -3,6 +3,7 @@
  */
 const express = require('express')
 const MonthlyBilling = require('../models/monthly_billing')
+const Contract = require('../models/contract')
 const Setting = require('../models/setting')
 
 const router = express.Router()
@@ -37,6 +38,49 @@ router.get('/billing/:token', async (req, res) => {
     }
 
     res.json(billing)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// GET /api/public/contract/:token - Lấy thông tin hợp đồng để người thuê xem và ký
+router.get('/contract/:token', async (req, res) => {
+  try {
+    const contract = await Contract.findOne({ share_token: req.params.token })
+      .populate('room_id', 'room_no price')
+      .populate('user_id', 'name phone id_number address')
+
+    if (!contract) {
+      return res.status(404).json({ message: 'Hợp đồng không tồn tại hoặc đường dẫn đã hết hạn' })
+    }
+
+    const settingDoc = await Setting.findOne({ key: 'app' })
+    const template = settingDoc?.contract_template || ''
+
+    res.json({ contract, template })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// POST /api/public/contract/:token/sign - Người thuê ký hợp đồng trực tuyến
+router.post('/contract/:token/sign', async (req, res) => {
+  try {
+    const { tenant_signature } = req.body
+    if (!tenant_signature) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp chữ ký cá nhân' })
+    }
+
+    const contract = await Contract.findOne({ share_token: req.params.token })
+    if (!contract) {
+      return res.status(404).json({ message: 'Hợp đồng không tồn tại hoặc đường dẫn đã hết hạn' })
+    }
+
+    contract.tenant_signature = tenant_signature
+    contract.tenant_signed_at = new Date()
+    await contract.save()
+
+    res.json({ message: 'Ký hợp đồng thành công!', contract })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }

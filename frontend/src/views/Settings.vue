@@ -164,7 +164,8 @@ const placeholders = [
   { value: '{{electric_price}}', label: 'Đơn giá điện' },
   { value: '{{water_price}}', label: 'Đơn giá nước' },
   { value: '{{service_fee}}', label: 'Phí dịch vụ' },
-  { value: '{{number_of_members}}', label: 'Số người ở' }
+  { value: '{{number_of_members}}', label: 'Số người ở' },
+  { value: '{{user_signature}}', label: 'Chữ ký người thuê' }
 ]
 
 const form = ref({
