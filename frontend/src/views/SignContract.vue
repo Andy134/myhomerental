@@ -238,7 +238,7 @@ function initCanvas() {
   const canvas = canvasEl.value
   if (!canvas) return
   const ctx = canvas.getContext('2d')
-  ctx.strokeStyle = '#000000'
+  ctx.strokeStyle = '#0d47a1' // Màu xanh biển (navy blue)
   ctx.lineWidth = 2.5
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
@@ -259,6 +259,10 @@ function startDrawing(e) {
   isDrawing.value = true
   isCanvasEmpty.value = false
   const ctx = canvasEl.value.getContext('2d')
+  ctx.strokeStyle = '#0d47a1' // Màu xanh biển (navy blue)
+  ctx.lineWidth = 2.5
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
   const pos = getPos(e)
   ctx.beginPath()
   ctx.moveTo(pos.x, pos.y)
@@ -267,6 +271,7 @@ function startDrawing(e) {
 function draw(e) {
   if (!isDrawing.value) return
   const ctx = canvasEl.value.getContext('2d')
+  ctx.strokeStyle = '#0d47a1' // Màu xanh biển (navy blue)
   const pos = getPos(e)
   ctx.lineTo(pos.x, pos.y)
   ctx.stroke()
