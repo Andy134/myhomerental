@@ -47,6 +47,7 @@
 | POST | `/api/contracts` | ✅ | Tạo hợp đồng mới |
 | PUT | `/api/contracts/:id` | ✅ | Cập nhật hợp đồng |
 | DELETE | `/api/contracts/:id` | ✅ | Xóa hợp đồng |
+| POST | `/api/contracts/:id/share-token` | ✅ | Tạo share token + link ký hợp đồng cho người thuê |
 
 ---
 
@@ -89,6 +90,8 @@
 |---|---|---|---|
 | GET | `/api/public/billing/:token` | ❌ | Xem hóa đơn qua share token |
 | GET | `/api/public/settings` | ❌ | Lấy thông tin thanh toán public (QR, tài khoản) |
+| GET | `/api/public/contract/:token` | ❌ | Xem thông tin hợp đồng + mẫu hợp đồng để người thuê ký |
+| POST | `/api/public/contract/:token/sign` | ❌ | Người thuê gửi chữ ký điện tử (vẽ/tải ảnh) |
 
 ---
 

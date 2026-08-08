@@ -35,16 +35,20 @@
 | _id | ObjectId | Auto |
 | code | String | Mã hợp đồng |
 | room_id | ObjectId → Room | Phòng |
+| room_no | String | Số phòng (lưu nhanh) |
 | user_id | ObjectId → User | Người thuê chính |
-| deposit | Number | Tiền cọc |
+| predict_price | Number | Tiền cọc |
 | start_date | String (ddmmyyyy) | Ngày bắt đầu |
 | end_date | String (ddmmyyyy) | Ngày kết thúc |
-| num_members | Number | Số người ở |
+| number_of_members | Number | Số người ở |
 | price | Number | Giá phòng |
 | electric_price | Number | Đơn giá điện (kWh) |
 | water_price | Number | Đơn giá nước (người) |
 | service_fee | Number | Phí dịch vụ (người) |
 | status | String | Trạng thái (từ status.json) |
+| share_token | String | Token chia sẻ link ký hợp đồng public |
+| tenant_signature | String | Chữ ký điện tử người thuê (base64 data URL) |
+| tenant_signed_at | Date | Thời điểm người thuê ký hợp đồng |
 | note | String | Ghi chú |
 | createdAt | Date | Auto |
 | updatedAt | Date | Auto |

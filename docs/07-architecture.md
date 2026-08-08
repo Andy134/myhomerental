@@ -19,10 +19,10 @@ HomeRental/
 │   │   │   └── user.js               # User model (người thuê)
 │   │   └── routes/
 │   │       ├── auth.js               # POST /api/auth/login
-│   │       ├── contracts.js          # CRUD /api/contracts
+│   │       ├── contracts.js          # CRUD /api/contracts + share-token (link ký hợp đồng)
 │   │       ├── expenses.js           # CRUD /api/expenses
 │   │       ├── monthly_billings.js   # CRUD + generate /api/monthly-billings
-│   │       ├── public.js             # Public (no-auth): /api/public/billing/:token, /api/public/settings
+│   │       ├── public.js             # Public (no-auth): /api/public/billing/:token, /api/public/settings, /api/public/contract/:token (+ sign)
 │   │       ├── rooms.js              # CRUD /api/rooms
 │   │       ├── settings.js           # GET+PUT /api/settings (yêu cầu auth)
 │   │       └── users.js              # CRUD /api/users
@@ -56,4 +56,5 @@ HomeRental/
             ├── MonthlyBilling.vue    # Quản lý hóa đơn tháng + chia sẻ link
             ├── Expenses.vue          # Quản lý chi phí
             ├── Settings.vue          # Cài đặt hệ thống (tài khoản thanh toán, mẫu hợp đồng)
-            └── SharedBilling.vue     # Trang public xem hóa đơn qua share token
+            ├── SharedBilling.vue     # Trang public xem hóa đơn qua share token
+            └── SignContract.vue      # Trang public ký hợp đồng điện tử (xem HĐ + vẽ/tải chữ ký)

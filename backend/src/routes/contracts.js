@@ -66,5 +66,54 @@ router.delete('/:id', authenticate, async (req, res) => {
   }
 })
 
+// POST /api/contracts/:id/share-token - Generate share token for signing contract
+router.post('/:id/share-token', authenticate, async (req, res) => {
+  try {
+    const contract = await Contract.findById(req.params.id)
+    if (!contract) return res.status(404).json({ message: 'Hợp đồng không tồn tại' })
+
+    if (!contract.share_token) {
+      const crypto = require('crypto')
+      contract.share_token = crypto.randomBytes(16).toString('hex')
+      await contract.save()
+    }
+
+    const shareUrl = `${req.protocol}://${req.get('host')}/sign-contract/${contract.share_token}`
+    res.json({
+      share_token: contract.share_token,
+      share_url: shareUrl
+    })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// POST /api/contracts/:id/reset-signature - Reset signature to recreate contract for re-signing
+router.post('/:id/reset-signature', authenticate, async (req, res) => {
+  try {
+    const contract = await Contract.findById(req.params.id)
+    if (!contract) return res.status(404).json({ message: 'Hợp đồng không tồn tại' })
+
+    // Xóa chữ ký cũ và thời gian ký
+    contract.tenant_signature = ''
+    contract.tenant_signed_at = null
+
+    // Sinh share_token mới để link cũ không còn hiệu lực
+    const crypto = require('crypto')
+    contract.share_token = crypto.randomBytes(16).toString('hex')
+
+    await contract.save()
+
+    const shareUrl = `${req.protocol}://${req.get('host')}/sign-contract/${contract.share_token}`
+    res.json({
+      contract,
+      share_token: contract.share_token,
+      share_url: shareUrl
+    })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 module.exports = router
 

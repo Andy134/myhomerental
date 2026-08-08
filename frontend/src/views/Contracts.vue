@@ -19,12 +19,13 @@
               <th>Ngày bắt đầu</th>
               <th>Ngày kết thúc</th>
               <th>Trạng thái</th>
+              <th>Chữ ký</th>
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
-<tbody>
-<tr v-if="loading">
-              <td colspan="8" class="text-center py-5 text-muted">
+          <tbody>
+            <tr v-if="loading">
+              <td colspan="9" class="text-center py-5 text-muted">
                 <div class="spinner-border text-primary mb-2" role="status">
                   <span class="visually-hidden">Đang tải...</span>
                 </div>
@@ -32,7 +33,7 @@
               </td>
             </tr>
             <tr v-else-if="contracts.length === 0">
-              <td colspan="8" class="text-center py-5 text-muted">
+              <td colspan="9" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có hợp đồng nào
               </td>
@@ -47,7 +48,18 @@
               <td>
                 <span class="badge" :class="statusBadge(c.status)">{{ statusLabel(c.status) }}</span>
               </td>
-<td class="text-center">
+              <td>
+                <span v-if="c.tenant_signature" class="badge bg-success-subtle text-success border border-success" title="Người thuê đã ký">
+                  <i class="bi bi-shield-check me-1"></i>Đã ký
+                </span>
+                <span v-else class="badge bg-light text-secondary border" title="Chưa có chữ ký người thuê">
+                  <i class="bi bi-clock me-1"></i>Chưa ký
+                </span>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-success me-1" title="Gửi link ký hợp đồng" @click="openShareModal(c)">
+                  <i class="bi bi-pen"></i>
+                </button>
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(c)">
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -61,6 +73,53 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Share Contract Modal -->
+    <div class="modal fade" id="shareContractModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-6 fw-bold">
+              <i class="bi bi-pen me-2 text-success"></i>Gửi link ký hợp đồng - {{ shareTarget?.code }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted mb-3">
+              Gửi đường dẫn dưới đây cho người thuê (qua Zalo, SMS, Messenger...). Người thuê mở link sẽ xem hợp đồng và vẽ/tải chữ ký trực tuyến mà không cần đăng nhập.
+            </p>
+            <div v-if="generatingToken" class="text-center py-3">
+              <div class="spinner-border spinner-border-sm text-primary me-1"></div>
+              <span>Đang tạo đường dẫn ký...</span>
+            </div>
+            <div v-else class="mb-3">
+              <label class="form-label fw-semibold small">Đường dẫn ký hợp đồng:</label>
+              <div class="input-group">
+                <input ref="shareUrlInput" type="text" readonly class="form-control" :value="shareUrl" />
+                <button class="btn btn-primary" type="button" @click="copyShareUrl">
+                  <i class="bi" :class="copied ? 'bi-check-lg' : 'bi-clipboard'"></i>
+                  {{ copied ? 'Đã chép!' : 'Sao chép' }}
+                </button>
+              </div>
+            </div>
+
+<div v-if="shareTarget?.tenant_signature" class="alert alert-warning py-2 px-3 mb-3 small">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i>Hợp đồng này đã được người thuê ký vào {{ formatDateTime(shareTarget.tenant_signed_at) }}. Nếu cần người thuê ký lại, bạn hãy tạo lại hợp đồng bên dưới.
+            </div>
+            <div v-if="settlingRecreate" class="text-center py-2">
+              <div class="spinner-border spinner-border-sm text-warning me-1"></div>
+              <span>Đang tạo lại hợp đồng...</span>
+            </div>
+            <button v-else-if="shareTarget?.tenant_signature" type="button" class="btn btn-warning btn-sm w-100" @click="recreateContract">
+              <i class="bi bi-arrow-clockwise me-1"></i>Tạo lại hợp đồng để ký lại
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -95,13 +154,13 @@
                     <option v-for="u in users" :key="u._id" :value="u._id">{{ u.name }} - {{ u.phone }}</option>
                   </select>
                 </div>
-<div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Tiền cọc</label>
                   <MoneyInput v-model="form.predict_price" />
                 </div>
               </div>
               <div class="row">
-<div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Ngày bắt đầu <span class="text-danger">*</span></label>
                   <DatePicker v-model="form.start_date" required />
                 </div>
@@ -115,7 +174,7 @@
                   <label class="form-label fw-semibold">Số người ở</label>
                   <input v-model.number="form.number_of_members" type="number" class="form-control" min="1" />
                 </div>
-<div class="col-md-4 mb-3">
+                <div class="col-md-4 mb-3">
                   <label class="form-label fw-semibold">Giá phòng</label>
                   <MoneyInput v-model="form.price" readonly />
                 </div>
@@ -125,7 +184,7 @@
                 </div>
               </div>
               <div class="row">
-<div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Đơn giá nước (người)</label>
                   <MoneyInput v-model="form.water_price" />
                 </div>
@@ -151,7 +210,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-<button type="submit" class="btn btn-primary" :disabled="saving">
+              <button type="submit" class="btn btn-primary" :disabled="saving">
                 <span v-if="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                 {{ saving ? 'Đang lưu...' : 'Lưu' }}
               </button>
@@ -172,9 +231,9 @@
           <div class="modal-body">
             Bạn có chắc muốn xóa hợp đồng <strong>{{ deleteTarget?.code }}</strong>?
           </div>
-<div class="modal-footer border-0">
+          <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-<button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
+            <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="deleting">
               <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               {{ deleting ? 'Đang xóa...' : 'Xóa' }}
             </button>
@@ -233,6 +292,14 @@ const template = ref('')
 const printTarget = ref(null)
 let contractPrintModal = null
 
+// Share contract state
+const shareTarget = ref(null)
+const shareUrl = ref('')
+const generatingToken = ref(false)
+const copied = ref(false)
+const settlingRecreate = ref(false)
+let shareContractModal = null
+
 const defaultForm = {
   code: '', room_id: '', room_no: '', user_id: '',
   predict_price: 0, start_date: '', end_date: '',
@@ -246,17 +313,27 @@ function formatDate(d) {
   if (!d || d.length !== 8) return d || ''
   return `${d.substring(0, 2)}-${d.substring(2, 4)}-${d.substring(4, 8)}`
 }
+function formatDateTime(dt) {
+  if (!dt) return ''
+  return new Date(dt).toLocaleString('vi-VN')
+}
 function statusLabel(s) { return { active: 'Đang hiệu lực', expired: 'Hết hạn', cancelled: 'Đã hủy' }[s] || s }
 function statusBadge(s) { return { active: 'bg-success', expired: 'bg-secondary', cancelled: 'bg-danger' }[s] || 'bg-secondary' }
 
 // Map dữ liệu hợp đồng để thay thế các biến (placeholder) trong mẫu
 function contractData(c) {
   const now = new Date()
+  const sigImgHtml = c.tenant_signature
+    ? `<img src="${c.tenant_signature}" style="max-height: 100px; vertical-align: middle; margin: 4px;" alt="Chữ ký người thuê" />`
+    : `<span style="color: #6c757d; font-style: italic;">[Chưa ký]</span>`
+
   return {
     code: c.code,
     room_no: c.room_no,
     user_name: c.user_id?.name || '--',
     user_phone: c.user_id?.phone || '',
+    user_id_number: c.user_id?.id_number || '',
+    user_address: c.user_id?.address || '',
     deposit: formatCurrency(c.predict_price),
     start_date: formatDate(c.start_date),
     end_date: formatDate(c.end_date),
@@ -267,7 +344,8 @@ function contractData(c) {
     number_of_members: c.number_of_members || 1,
     current_day: String(now.getDate()).padStart(2, '0'),
     current_month: String(now.getMonth() + 1).padStart(2, '0'),
-    current_year: now.getFullYear()
+    current_year: now.getFullYear(),
+    user_signature: sigImgHtml
   }
 }
 
@@ -290,7 +368,54 @@ onMounted(async () => {
   contractModal = new Modal(document.getElementById('contractModal'))
   deleteModal = new Modal(document.getElementById('deleteModal'))
   contractPrintModal = new Modal(document.getElementById('contractPrintModal'))
+  shareContractModal = new Modal(document.getElementById('shareContractModal'))
 })
+
+async function openShareModal(c) {
+  shareTarget.value = c
+  shareUrl.value = ''
+  copied.value = false
+  shareContractModal.show()
+
+  generatingToken.value = true
+  try {
+    const res = await api.post(`/contracts/${c._id}/share-token`)
+    // Tự tạo link từ origin của frontend (http://localhost:5173 khi dev, domain Vercel khi production)
+    // Không dùng share_url từ backend vì qua Vite proxy Host header bị đổi thành localhost:3000
+    shareUrl.value = `${window.location.origin}/sign-contract/${res.data.share_token}`
+  } catch (e) {
+    alert(e.response?.data?.message || 'Không thể tạo link chia sẻ')
+  } finally {
+    generatingToken.value = false
+  }
+}
+
+function copyShareUrl() {
+  if (!shareUrl.value) return
+  navigator.clipboard.writeText(shareUrl.value)
+  copied.value = true
+  setTimeout(() => { copied.value = false }, 2000)
+}
+
+async function recreateContract() {
+  if (!shareTarget.value?._id) return
+  if (!confirm(`Tạo lại hợp đồng "${shareTarget.value.code}" sẽ xóa chữ ký cũ và tạo link ký mới cho người thuê. Bạn có chắc chắn?`)) return
+
+  settlingRecreate.value = true
+  try {
+    const res = await api.post(`/contracts/${shareTarget.value._id}/reset-signature`)
+    shareTarget.value = res.data.contract
+    // Tự tạo link từ origin của frontend, không dùng share_url backend (tránh port 3000 cố định)
+    shareUrl.value = `${window.location.origin}/sign-contract/${res.data.share_token}`
+    copied.value = false
+    await loadContracts()
+    alert('Đã tạo lại hợp đồng. Vui lòng gửi link mới cho người thuê để ký lại.')
+  } catch (e) {
+    alert(e.response?.data?.message || 'Không thể tạo lại hợp đồng')
+  } finally {
+    settlingRecreate.value = false
+  }
+}
 
 async function loadTemplate() {
   try {
@@ -307,10 +432,12 @@ async function loadContracts() {
   catch (e) { console.error(e) }
   finally { loading.value = false }
 }
+
 async function loadRooms() {
   try { rooms.value = (await api.get('/rooms')).data }
   catch (e) { console.error(e) }
 }
+
 async function loadUsers() {
   try { users.value = (await api.get('/users')).data }
   catch (e) { console.error(e) }
@@ -389,6 +516,7 @@ function handlePrintContract() {
       <title>Hợp đồng thuê phòng - ${printTarget.value?.code || ''}</title>
       <style>
         body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+        img { max-width: 100%; object-fit: contain; vertical-align: middle; }
         @media print { body { padding: 20px; } }
       </style>
     </head>
@@ -400,7 +528,7 @@ function handlePrintContract() {
   printWindow.document.close()
   printWindow.focus()
 
-// Chờ render xong rồi in
+  // Chờ render xong rồi in
   setTimeout(() => {
     printWindow.print()
   }, 500)
@@ -417,5 +545,9 @@ function handlePrintContract() {
 .contract-print-preview :deep(h2) {
   text-align: center;
 }
-</style>
 
+.contract-print-preview :deep(img) {
+  max-width: 100%;
+  object-fit: contain;
+}
+</style>
