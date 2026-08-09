@@ -323,7 +323,7 @@ function statusBadge(s) { return { active: 'bg-success', expired: 'bg-secondary'
 // Map dữ liệu hợp đồng để thay thế các biến (placeholder) trong mẫu
 function contractData(c) {
   const now = new Date()
-  const sigImgHtml = c.tenant_signature
+const sigImgHtml = c.tenant_signature
     ? `<img src="${c.tenant_signature}" style="max-height: 100px; vertical-align: middle; margin: 4px;" alt="Chữ ký người thuê" />`
     : `<span style="color: #6c757d; font-style: italic;">[Chưa ký]</span>`
 
@@ -332,7 +332,7 @@ function contractData(c) {
     room_no: c.room_no,
     user_name: c.user_id?.name || '--',
     user_phone: c.user_id?.phone || '',
-    user_id_number: c.user_id?.id_number || '',
+    user_id_number: c.user_id?.personal_number || '',
     user_address: c.user_id?.address || '',
     deposit: formatCurrency(c.predict_price),
     start_date: formatDate(c.start_date),

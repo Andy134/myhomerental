@@ -48,7 +48,7 @@ router.get('/contract/:token', async (req, res) => {
   try {
     const contract = await Contract.findOne({ share_token: req.params.token })
       .populate('room_id', 'room_no price')
-      .populate('user_id', 'name phone id_number address')
+      .populate('user_id', 'name phone document personal_number address')
 
     if (!contract) {
       return res.status(404).json({ message: 'Hợp đồng không tồn tại hoặc đường dẫn đã hết hạn' })

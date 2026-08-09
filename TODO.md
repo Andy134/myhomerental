@@ -1,11 +1,9 @@
-# TODO - Commit, Merge & Deploy Master
+# Task: Thêm trường personal_number (CCCD) và hiển thị trong hợp đồng
 
-## Mục tiêu
-Commit toàn bộ thay đổi trên `develop`, merge vào `master` và deploy theo rule.
-
-## Các bước
-- [x] 1. Commit toàn bộ thay đổi trên nhánh `develop`.
-- [x] 2. Push `develop` lên `origin/develop`.
-- [ ] 3. Merge `develop` vào `master` local.
-- [ ] 4. Push `master` lên `origin/master`.
-- [ ] 5. Deploy lên Vercel production & kiểm tra.
+## Steps
+- [x] 1. Thêm field `personal_number` vào User model (`backend/src/models/user.js`)
+- [x] 2. Thêm input "Số CCCD" vào giao diện quản lý user (`frontend/src/views/Users.vue`)
+- [x] 3. Cập nhật populate user trong `backend/src/routes/public.js` để trả về `personal_number`
+- [x] 4. Cập nhật populate user trong `backend/src/routes/contracts.js` để trả về `personal_number`
+- [x] 5. Sửa `SignContract.vue` dùng `personal_number` thay cho `id_number`
+- [x] 6. Sửa `Contracts.vue` dùng `personal_number` thay cho `id_number`
