@@ -186,7 +186,7 @@ const renderedContractHtml = computed(() => {
   const c = contract.value
   const now = new Date()
 
-  const sigImgHtml = c.tenant_signature
+const sigImgHtml = c.tenant_signature
     ? `<img src="${c.tenant_signature}" style="max-height: 100px; vertical-align: middle; margin: 4px;" alt="Chữ ký người thuê" />`
     : `<span class="text-muted italic">[Chờ người thuê ký...]</span>`
 
@@ -195,7 +195,7 @@ const renderedContractHtml = computed(() => {
     room_no: c.room_no,
     user_name: c.user_id?.name || '--',
     user_phone: c.user_id?.phone || '',
-    user_id_number: c.user_id?.id_number || '',
+    user_id_number: c.user_id?.personal_number || '',
     user_address: c.user_id?.address || '',
     deposit: formatCurrency(c.predict_price),
     start_date: formatDate(c.start_date),

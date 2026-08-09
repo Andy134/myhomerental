@@ -9,10 +9,10 @@ const userSchema = new mongoose.Schema({
   phone:    { type: String, default: '' },
   email:    { type: String, default: '' },
   document: { type: String, default: '' },
+  personal_number: { type: String, default: '' },
   note:     { type: String, default: '' }
 }, {
   timestamps: true
 })
 
 module.exports = mongoose.model('User', userSchema)
-

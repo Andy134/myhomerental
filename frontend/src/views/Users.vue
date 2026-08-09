@@ -15,22 +15,23 @@
               <th>Tên</th>
               <th>Điện thoại</th>
               <th>Email</th>
-              <th>Giấy tờ</th>
+<th>Giấy tờ</th>
+              <th>Số CCCD</th>
               <th>Ghi chú</th>
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
 <tbody>
-            <tr v-if="loading">
-              <td colspan="6" class="text-center py-5 text-muted">
+<tr v-if="loading">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <div class="spinner-border text-primary mb-2" role="status">
                   <span class="visually-hidden">Đang tải...</span>
                 </div>
                 <div>Đang tải dữ liệu...</div>
               </td>
             </tr>
-            <tr v-else-if="users.length === 0">
-              <td colspan="6" class="text-center py-5 text-muted">
+<tr v-else-if="users.length === 0">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có người thuê nào
               </td>
@@ -39,7 +40,8 @@
               <td class="fw-semibold">{{ u.name }}</td>
               <td>{{ u.phone || '--' }}</td>
               <td>{{ u.email || '--' }}</td>
-              <td>{{ u.document || '--' }}</td>
+<td>{{ u.document || '--' }}</td>
+              <td>{{ u.personal_number || '--' }}</td>
               <td>{{ u.note || '--' }}</td>
               <td class="text-center">
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(u)">
@@ -78,8 +80,12 @@
                 <input v-model="form.email" type="email" class="form-control" placeholder="Email" />
               </div>
               <div class="mb-3">
-                <label class="form-label fw-semibold">Giấy tờ</label>
+<label class="form-label fw-semibold">Giấy tờ</label>
                 <input v-model="form.document" class="form-control" placeholder="CMND/CCCD" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Số CCCD</label>
+                <input v-model="form.personal_number" class="form-control" placeholder="Số căn cước công dân" />
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Ghi chú</label>
@@ -136,7 +142,7 @@ const isEditing = ref(false)
 const editingId = ref(null)
 const deleteTarget = ref(null)
 
-const defaultForm = { name: '', phone: '', email: '', document: '', note: '' }
+const defaultForm = { name: '', phone: '', email: '', document: '', personal_number: '', note: '' }
 const form = ref({ ...defaultForm })
 
 let userModal = null
