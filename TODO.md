@@ -1,9 +1,15 @@
-# Task: Thêm trường personal_number (CCCD) và hiển thị trong hợp đồng
+# TODO - Lấy số điện cũ từ tháng trước khi tạo hóa đơn
 
-## Steps
-- [x] 1. Thêm field `personal_number` vào User model (`backend/src/models/user.js`)
-- [x] 2. Thêm input "Số CCCD" vào giao diện quản lý user (`frontend/src/views/Users.vue`)
-- [x] 3. Cập nhật populate user trong `backend/src/routes/public.js` để trả về `personal_number`
-- [x] 4. Cập nhật populate user trong `backend/src/routes/contracts.js` để trả về `personal_number`
-- [x] 5. Sửa `SignContract.vue` dùng `personal_number` thay cho `id_number`
-- [x] 6. Sửa `Contracts.vue` dùng `personal_number` thay cho `id_number`
+## Nhiệm vụ
+Khi tạo dữ liệu hóa đơn tháng mới, hệ thống cần lấy `new_electric` của hóa đơn tháng trước
+(cùng phòng) để fill vào trường `old_electric` của tháng hiện tại.
+
+## Các bước
+- [ ] 1. Sửa route `generate` trong `backend/src/routes/monthly_billings.js`:
+  - Thêm hàm helper `getPrevMonth(month)` tính tháng trước từ chuỗi `yyyymm`.
+  - Khi tạo hóa đơn cho mỗi hợp đồng, tìm hóa đơn tháng trước của cùng `room_id`,
+    lấy `new_electric` làm `old_electric`. Nếu không có (tháng đầu), giữ `old_electric = 0`.
+  - `new_electric` vẫn để 0 để người dùng nhập sau khi đọc đồng hồ.
+
+## Kiểm tra sau khi sửa
+- [ ] Test luồng generate trên backend (cần server chạy Mongo).
