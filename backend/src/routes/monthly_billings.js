@@ -37,6 +37,21 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 })
 
+// Helper: tính tháng trước từ chuỗi yyyymm, trả về null nếu không hợp lệ
+function getPrevMonth(month) {
+  if (!month || month.length !== 6) return null
+  const y = parseInt(month.substring(0, 4), 10)
+  const m = parseInt(month.substring(4, 6), 10)
+  if (isNaN(y) || isNaN(m) || m < 1 || m > 12) return null
+  let prevY = y
+  let prevM = m - 1
+  if (prevM === 0) {
+    prevM = 12
+    prevY = y - 1
+  }
+  return `${prevY}${String(prevM).padStart(2, '0')}`
+}
+
 // POST /api/monthly-billings/generate - Generate billings for a month
 router.post('/generate', authenticate, async (req, res) => {
   try {
@@ -60,6 +75,22 @@ router.post('/generate', authenticate, async (req, res) => {
 
     if (contracts.length === 0) return res.status(400).json({ message: 'No active contracts found' })
 
+    // Lấy tháng trước để lấy số điện cũ
+    const prevMonth = getPrevMonth(month)
+
+    // Lấy tất cả hóa đơn tháng trước (nếu có) để map theo room_id
+    let prevBillings = []
+    if (prevMonth) {
+      prevBillings = await MonthlyBilling.find({ month: prevMonth })
+    }
+    // Map room_id -> new_electric của tháng trước
+    const prevNewElectricMap = {}
+    prevBillings.forEach(pb => {
+      if (pb.room_id && !(pb.room_id in prevNewElectricMap)) {
+        prevNewElectricMap[pb.room_id] = pb.new_electric || 0
+      }
+    })
+
     const billings = contracts.map(contract => {
       const roomPrice = contract.price || 0
       const serviceFee = contract.service_fee || 0
@@ -69,12 +100,15 @@ router.post('/generate', authenticate, async (req, res) => {
       const serviceCost = serviceFee * numMembers
       const totalPrice = roomPrice + waterFee + serviceCost
 
+      // Lấy số điện cũ = new_electric của tháng trước (cùng phòng), mặc định 0
+      const prevElectric = prevNewElectricMap[contract.room_id._id] || 0
+
       return {
         month,
         room_id: contract.room_id._id,
         room_no: contract.room_no,
         user_id: contract.user_id._id,
-        old_electric: 0,
+        old_electric: prevElectric,
         new_electric: 0,
         electric_price: contract.electric_price || 0,
         water_price: waterPrice,
