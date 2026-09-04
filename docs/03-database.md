@@ -7,6 +7,9 @@
 | phone | String | Điện thoại |
 | email | String | Email |
 | document | String | Giấy tờ tùy thân |
+| personal_number | String | Số CCCD |
+| date_of_birth | String (ddmmyyyy) | Ngày tháng năm sinh |
+| permanent_address | String | Địa chỉ thường trú |
 | note | String | Ghi chú |
 | createdAt | Date | Auto (timestamps) |
 | updatedAt | Date | Auto (timestamps) |

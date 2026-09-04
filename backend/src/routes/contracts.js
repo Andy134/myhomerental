@@ -12,7 +12,7 @@ router.get('/', authenticate, async (req, res) => {
   try {
     const contracts = await Contract.find()
       .populate('room_id', 'room_no price')
-      .populate('user_id', 'name phone document personal_number')
+      .populate('user_id', 'name phone document personal_number date_of_birth permanent_address')
       .sort({ createdAt: -1 })
     res.json(contracts)
   } catch (err) {
@@ -25,7 +25,7 @@ router.get('/:id', authenticate, async (req, res) => {
   try {
     const contract = await Contract.findById(req.params.id)
       .populate('room_id', 'room_no price')
-      .populate('user_id', 'name phone document personal_number')
+      .populate('user_id', 'name phone document personal_number date_of_birth permanent_address')
     if (!contract) return res.status(404).json({ message: 'Contract not found' })
     res.json(contract)
   } catch (err) {

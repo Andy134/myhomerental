@@ -15,15 +15,17 @@
               <th>Tên</th>
               <th>Điện thoại</th>
               <th>Email</th>
-<th>Giấy tờ</th>
+              <th>Giấy tờ</th>
               <th>Số CCCD</th>
+              <th>Ngày sinh</th>
+              <th>Địa chỉ thường trú</th>
               <th>Ghi chú</th>
               <th class="text-center">Thao tác</th>
             </tr>
           </thead>
 <tbody>
 <tr v-if="loading">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="9" class="text-center py-5 text-muted">
                 <div class="spinner-border text-primary mb-2" role="status">
                   <span class="visually-hidden">Đang tải...</span>
                 </div>
@@ -31,7 +33,7 @@
               </td>
             </tr>
 <tr v-else-if="users.length === 0">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="9" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có người thuê nào
               </td>
@@ -40,8 +42,10 @@
               <td class="fw-semibold">{{ u.name }}</td>
               <td>{{ u.phone || '--' }}</td>
               <td>{{ u.email || '--' }}</td>
-<td>{{ u.document || '--' }}</td>
+              <td>{{ u.document || '--' }}</td>
               <td>{{ u.personal_number || '--' }}</td>
+              <td>{{ formatDate(u.date_of_birth) || '--' }}</td>
+              <td>{{ u.permanent_address || '--' }}</td>
               <td>{{ u.note || '--' }}</td>
               <td class="text-center">
                 <button class="btn btn-sm btn-outline-primary me-1" title="Sửa" @click="openEditModal(u)">
@@ -88,6 +92,14 @@
                 <input v-model="form.personal_number" class="form-control" placeholder="Số căn cước công dân" />
               </div>
               <div class="mb-3">
+                <label class="form-label fw-semibold">Ngày tháng năm sinh</label>
+                <DatePicker v-model="form.date_of_birth" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Địa chỉ thường trú</label>
+                <textarea v-model="form.permanent_address" class="form-control" rows="2" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+              </div>
+              <div class="mb-3">
                 <label class="form-label fw-semibold">Ghi chú</label>
                 <textarea v-model="form.note" class="form-control" rows="2"></textarea>
               </div>
@@ -132,6 +144,7 @@
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import AppLayout from '../components/AppLayout.vue'
+import DatePicker from '../components/DatePicker.vue'
 import api from '../services/api.js'
 
 const users = ref([])
@@ -142,8 +155,13 @@ const isEditing = ref(false)
 const editingId = ref(null)
 const deleteTarget = ref(null)
 
-const defaultForm = { name: '', phone: '', email: '', document: '', personal_number: '', note: '' }
+const defaultForm = { name: '', phone: '', email: '', document: '', personal_number: '', date_of_birth: '', permanent_address: '', note: '' }
 const form = ref({ ...defaultForm })
+
+function formatDate(d) {
+  if (!d || d.length !== 8) return d || ''
+  return `${d.substring(0, 2)}/${d.substring(2, 4)}/${d.substring(4, 8)}`
+}
 
 let userModal = null
 let deleteModal = null

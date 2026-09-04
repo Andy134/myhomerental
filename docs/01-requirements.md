@@ -20,7 +20,7 @@ Admin có thể
 
 ## User management:
 1. Xem danh sách/Xem chi tiết/Thêm/Sửa/Xóa người thuê
-2. Các trường: Tên, Điện thoại, Email, Giấy tờ, Ghi chú
+2. Các trường: Tên, Điện thoại, Email, Giấy tờ, Số CCCD, Ngày tháng năm sinh, Địa chỉ thường trú, Ghi chú
 
 ## Contract management:
 1. Xem danh sách/Xem chi tiết/Thêm/Sửa/Xóa hợp đồng

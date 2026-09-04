@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   email:    { type: String, default: '' },
   document: { type: String, default: '' },
   personal_number: { type: String, default: '' },
+  date_of_birth: { type: String, default: '' },
+  permanent_address: { type: String, default: '' },
   note:     { type: String, default: '' }
 }, {
   timestamps: true
