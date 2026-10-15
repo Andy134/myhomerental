@@ -3,9 +3,10 @@
  */
 const express = require('express')
 const Expense = require('../models/expense')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // GET /api/expenses - List all expenses
 router.get('/', authenticate, async (req, res) => {

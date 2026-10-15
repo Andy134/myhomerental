@@ -3,9 +3,10 @@
  */
 const express = require('express')
 const Room = require('../models/room')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // GET /api/rooms - List all rooms
 router.get('/', authenticate, async (req, res) => {

@@ -3,9 +3,10 @@
  */
 const express = require('express')
 const User = require('../models/user')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // GET /api/users - List all users
 router.get('/', authenticate, async (req, res) => {

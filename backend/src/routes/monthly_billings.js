@@ -4,10 +4,11 @@
 const express = require('express')
 const MonthlyBilling = require('../models/monthly_billing')
 const Contract = require('../models/contract')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 const crypto = require('crypto')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // GET /api/monthly-billings - List all billings
 router.get('/', authenticate, async (req, res) => {

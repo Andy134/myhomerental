@@ -3,9 +3,10 @@
  */
 const express = require('express')
 const Setting = require('../models/setting')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // Helper: lấy document settings (tạo nếu chưa tồn tại)
 async function getSettingsDoc() {

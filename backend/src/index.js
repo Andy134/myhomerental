@@ -14,6 +14,7 @@ const monthlyBillingRoutes = require('./routes/monthly_billings')
 const expenseRoutes = require('./routes/expenses')
 const settingRoutes = require('./routes/settings')
 const publicRoutes = require('./routes/public')
+const ensureInitialAdmin = require('./services/initial-admin')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -41,8 +42,9 @@ app.get('/api/health', (req, res) => {
 // Chạy local (npm start / node src/index.js) → kết nối MongoDB + listen
 if (require.main === module) {
   mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
+    .then(async () => {
       console.log('Connected to MongoDB')
+      await ensureInitialAdmin()
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`)
       })
@@ -64,8 +66,9 @@ function connectDB() {
     connectTimeoutMS: 8000,
     bufferCommands: false
   })
-    .then(() => {
+    .then(async () => {
       console.log('Connected to MongoDB (serverless)')
+      await ensureInitialAdmin()
       return mongoose.connection
     })
     .catch(err => {

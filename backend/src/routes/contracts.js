@@ -3,9 +3,10 @@
  */
 const express = require('express')
 const Contract = require('../models/contract')
-const authenticate = require('../middleware/auth')
+const { authenticate, authorize } = require('../middleware/auth')
 
 const router = express.Router()
+router.use(authenticate, authorize('admin'))
 
 // GET /api/contracts - List all contracts (populate room & user)
 router.get('/', authenticate, async (req, res) => {

@@ -3,7 +3,14 @@
  */
 const http = require('http')
 
-const data = JSON.stringify({ username: 'admin', password: 'admin123' })
+const username = process.env.ADMIN_USERNAME
+const password = process.env.ADMIN_PASSWORD
+
+if (!username || !password) {
+  throw new Error('Set ADMIN_USERNAME and ADMIN_PASSWORD before running this test.')
+}
+
+const data = JSON.stringify({ username, password })
 
 const options = {
   hostname: 'localhost',
