@@ -20,6 +20,14 @@ export async function login(username, password) {
 }
 
 /**
+ * Change the password of the authenticated account.
+ */
+export async function changePassword(currentPassword, newPassword) {
+  const response = await api.put('/auth/change-password', { currentPassword, newPassword })
+  return response.data
+}
+
+/**
  * Logout - clear stored credentials
  */
 export function logout() {

@@ -73,6 +73,8 @@
           <strong>{{ username }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+          <li><a class="dropdown-item" href="#" @click.prevent="openChangePassword"><i class="bi bi-key me-2"></i>Đổi mật khẩu</a></li>
+          <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="#" @click.prevent="handleLogout"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
         </ul>
       </div>
@@ -108,13 +110,51 @@
         <slot />
       </div>
     </div>
+
+    <!-- Change password modal -->
+    <div v-if="showChangePasswordModal" class="modal fade show d-block change-password-backdrop" tabindex="-1" role="dialog" aria-modal="true" @click.self="closeChangePassword">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form @submit.prevent="handleChangePassword">
+            <div class="modal-header">
+              <h5 class="modal-title"><i class="bi bi-key me-2"></i>Đổi mật khẩu</h5>
+              <button type="button" class="btn-close" aria-label="Đóng" :disabled="changingPassword" @click="closeChangePassword"></button>
+            </div>
+            <div class="modal-body">
+              <div v-if="changePasswordError" class="alert alert-danger py-2" role="alert">{{ changePasswordError }}</div>
+              <div v-if="changePasswordSuccess" class="alert alert-success py-2" role="alert">{{ changePasswordSuccess }}</div>
+              <div class="mb-3">
+                <label for="current-password" class="form-label">Mật khẩu hiện tại</label>
+                <input id="current-password" v-model="passwordForm.currentPassword" type="password" class="form-control" autocomplete="current-password" :disabled="changingPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="new-password" class="form-label">Mật khẩu mới</label>
+                <input id="new-password" v-model="passwordForm.newPassword" type="password" class="form-control" autocomplete="new-password" minlength="8" :disabled="changingPassword" required>
+                <div class="form-text">Mật khẩu mới cần có ít nhất 8 ký tự.</div>
+              </div>
+              <div>
+                <label for="confirm-password" class="form-label">Xác nhận mật khẩu mới</label>
+                <input id="confirm-password" v-model="passwordForm.confirmPassword" type="password" class="form-control" autocomplete="new-password" :disabled="changingPassword" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" :disabled="changingPassword" @click="closeChangePassword">Hủy</button>
+              <button type="submit" class="btn btn-primary" :disabled="changingPassword">
+                <span v-if="changingPassword" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                {{ changingPassword ? 'Đang lưu...' : 'Đổi mật khẩu' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getUsername, logout } from '../services/auth.js'
+import { changePassword, getUsername, logout } from '../services/auth.js'
 
 defineProps({
   pageTitle: { type: String, default: '' },
@@ -125,6 +165,11 @@ const router = useRouter()
 const route = useRoute()
 const username = ref(getUsername() || 'Admin')
 const sidebarOpen = ref(false)
+const showChangePasswordModal = ref(false)
+const changingPassword = ref(false)
+const changePasswordError = ref('')
+const changePasswordSuccess = ref('')
+const passwordForm = ref({ currentPassword: '', newPassword: '', confirmPassword: '' })
 
 const currentDate = computed(() => {
   const now = new Date()
@@ -143,6 +188,39 @@ function isActive(path) {
 function closeSidebarOnMobile() {
   if (window.innerWidth < 992) {
     sidebarOpen.value = false
+  }
+}
+
+function openChangePassword() {
+  sidebarOpen.value = false
+  passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+  changePasswordError.value = ''
+  changePasswordSuccess.value = ''
+  showChangePasswordModal.value = true
+}
+
+function closeChangePassword() {
+  if (!changingPassword.value) showChangePasswordModal.value = false
+}
+
+async function handleChangePassword() {
+  changePasswordError.value = ''
+  changePasswordSuccess.value = ''
+
+  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    changePasswordError.value = 'Xác nhận mật khẩu mới không khớp.'
+    return
+  }
+
+  changingPassword.value = true
+  try {
+    await changePassword(passwordForm.value.currentPassword, passwordForm.value.newPassword)
+    changePasswordSuccess.value = 'Đổi mật khẩu thành công.'
+    passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+  } catch (error) {
+    changePasswordError.value = error.response?.data?.message || 'Không thể đổi mật khẩu. Vui lòng thử lại.'
+  } finally {
+    changingPassword.value = false
   }
 }
 
@@ -264,6 +342,10 @@ function handleLogout() {
 .content {
   flex: 1;
   overflow-y: auto;
+}
+
+.change-password-backdrop {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* ===== RESPONSIVE (tablet & mobile < 992px) ===== */
