@@ -1,10 +1,21 @@
 <template>
   <AppLayout pageTitle="Quản lý chi phí" pageSubtitle="Danh sách các khoản chi">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <button class="btn btn-primary" @click="openAddModal">
         <i class="bi bi-plus-lg me-1"></i>Thêm chi phí
       </button>
-      <span class="text-muted small">Tổng chi: <strong>{{ formatCurrency(totalAmount) }}</strong></span>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small">Tổng chi: <strong>{{ formatCurrency(totalAmount) }}</strong></span>
+        <div class="d-flex align-items-center gap-2">
+          <label for="expense-sort" class="text-muted small text-nowrap">Sắp xếp:</label>
+          <select id="expense-sort" v-model="sortOption" class="form-select form-select-sm">
+            <option value="date-desc">Ngày: mới nhất</option>
+            <option value="date-asc">Ngày: cũ nhất</option>
+            <option value="amount-asc">Số tiền: tăng dần</option>
+            <option value="amount-desc">Số tiền: giảm dần</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -34,7 +45,7 @@
                 Chưa có chi phí nào
               </td>
             </tr>
-            <tr v-for="e in expenses" :key="e._id">
+            <tr v-for="e in sortedExpenses" :key="e._id">
               <td>{{ formatDate(e.date) }}</td>
               <td class="fw-semibold">{{ e.description }}</td>
               <td class="text-danger fw-bold">{{ formatCurrency(e.amount) }}</td>
@@ -131,6 +142,7 @@ const deleting = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
 const deleteTarget = ref(null)
+const sortOption = ref('date-desc')
 
 const defaultForm = { date: '', description: '', amount: 0, note: '' }
 const form = ref({ ...defaultForm })
@@ -143,6 +155,17 @@ function formatDate(d) {
 }
 
 const totalAmount = computed(() => expenses.value.reduce((s, e) => s + (e.amount || 0), 0))
+
+const sortedExpenses = computed(() => {
+  const [field, direction] = sortOption.value.split('-')
+  const multiplier = direction === 'asc' ? 1 : -1
+
+  return [...expenses.value].sort((a, b) => {
+    const aValue = field === 'date' ? Number(a.date) || 0 : Number(a.amount) || 0
+    const bValue = field === 'date' ? Number(b.date) || 0 : Number(b.amount) || 0
+    return (aValue - bValue) * multiplier
+  })
+})
 
 let expenseModal = null
 let deleteModal = null
