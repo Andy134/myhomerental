@@ -14,6 +14,7 @@ const monthlyBillingRoutes = require('./routes/monthly_billings')
 const expenseRoutes = require('./routes/expenses')
 const settingRoutes = require('./routes/settings')
 const publicRoutes = require('./routes/public')
+const tenantPortalRoutes = require('./routes/tenant_portal')
 const ensureInitialAdmin = require('./services/initial-admin')
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/api/monthly-billings', monthlyBillingRoutes)
 app.use('/api/expenses', expenseRoutes)
 app.use('/api/settings', settingRoutes)
 app.use('/api/public', publicRoutes)
+app.use('/api/tenant-portal', tenantPortalRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

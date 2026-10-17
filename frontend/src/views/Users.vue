@@ -15,6 +15,7 @@
               <th>Tên</th>
               <th>Điện thoại</th>
               <th>Email</th>
+              <th>Tài khoản cổng thông tin</th>
               <th>Giấy tờ</th>
               <th>Số CCCD</th>
               <th>Ngày sinh</th>
@@ -25,7 +26,7 @@
           </thead>
 <tbody>
 <tr v-if="loading">
-              <td colspan="9" class="text-center py-5 text-muted">
+              <td colspan="10" class="text-center py-5 text-muted">
                 <div class="spinner-border text-primary mb-2" role="status">
                   <span class="visually-hidden">Đang tải...</span>
                 </div>
@@ -33,7 +34,7 @@
               </td>
             </tr>
 <tr v-else-if="users.length === 0">
-              <td colspan="9" class="text-center py-5 text-muted">
+              <td colspan="10" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                 Chưa có người thuê nào
               </td>
@@ -42,6 +43,7 @@
               <td class="fw-semibold">{{ u.name }}</td>
               <td>{{ u.phone || '--' }}</td>
               <td>{{ u.email || '--' }}</td>
+              <td>{{ u.login_username || '--' }}</td>
               <td>{{ u.document || '--' }}</td>
               <td>{{ u.personal_number || '--' }}</td>
               <td>{{ formatDate(u.date_of_birth) || '--' }}</td>
@@ -82,6 +84,21 @@
               <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
                 <input v-model="form.email" type="email" class="form-control" placeholder="Email" />
+              </div>
+              <div class="border rounded p-3 mb-3 bg-light">
+                <div class="fw-semibold mb-2"><i class="bi bi-person-lock me-1"></i>Tài khoản cổng thông tin người thuê</div>
+                <div class="mb-2">
+                  <label class="form-label">Tên đăng nhập</label>
+                  <input v-model="form.login_username" class="form-control" placeholder="Để trống nếu chưa cấp tài khoản" autocomplete="username" />
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">{{ isEditing ? 'Mật khẩu mới' : 'Mật khẩu' }}</label>
+                  <input v-model="form.password" type="password" class="form-control" :placeholder="isEditing ? 'Để trống nếu không đổi mật khẩu' : 'Tối thiểu 8 ký tự'" minlength="8" autocomplete="new-password" />
+                </div>
+                <div v-if="form.login_username" class="form-check">
+                  <input id="tenant-active" v-model="form.is_active" class="form-check-input" type="checkbox">
+                  <label for="tenant-active" class="form-check-label">Cho phép người thuê đăng nhập</label>
+                </div>
               </div>
               <div class="mb-3">
 <label class="form-label fw-semibold">Giấy tờ</label>
@@ -155,7 +172,7 @@ const isEditing = ref(false)
 const editingId = ref(null)
 const deleteTarget = ref(null)
 
-const defaultForm = { name: '', phone: '', email: '', document: '', personal_number: '', date_of_birth: '', permanent_address: '', note: '' }
+const defaultForm = { name: '', phone: '', email: '', login_username: '', password: '', is_active: true, document: '', personal_number: '', date_of_birth: '', permanent_address: '', note: '' }
 const form = ref({ ...defaultForm })
 
 function formatDate(d) {
@@ -189,7 +206,7 @@ function openAddModal() {
 function openEditModal(u) {
   isEditing.value = true
   editingId.value = u._id
-  form.value = { ...u }
+  form.value = { ...defaultForm, ...u, password: '' }
   userModal.show()
 }
 

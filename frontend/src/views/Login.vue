@@ -19,6 +19,14 @@
           </div>
 
           <!-- Login Form -->
+          <div class="nav nav-pills nav-fill mb-4 login-role-tabs" role="tablist" aria-label="Chọn loại tài khoản">
+            <button type="button" class="nav-link" :class="{ active: selectedRole === 'tenant' }" @click="selectRole('tenant')">
+              <i class="bi bi-person me-1"></i>Người thuê
+            </button>
+            <button type="button" class="nav-link" :class="{ active: selectedRole === 'admin' }" @click="selectRole('admin')">
+              <i class="bi bi-shield-lock me-1"></i>Quản trị viên
+            </button>
+          </div>
           <form @submit.prevent="handleSubmit" novalidate>
             <!-- Username -->
             <div class="mb-3">
@@ -34,7 +42,7 @@
                   v-model="username"
                   type="text"
                   class="form-control border-start-0 ps-0"
-                  placeholder="Nhập tên đăng nhập"
+                  :placeholder="selectedRole === 'tenant' ? 'Nhập tên đăng nhập người thuê' : 'Nhập tên đăng nhập quản trị'"
                   :disabled="loading"
                   autocomplete="username"
                   required
@@ -85,7 +93,7 @@
                 aria-hidden="true"
               ></span>
               <i v-else class="bi bi-box-arrow-in-right me-2"></i>
-              {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+              {{ loading ? 'Đang đăng nhập...' : `Đăng nhập ${selectedRole === 'tenant' ? 'người thuê' : 'quản trị'}` }}
             </button>
           </form>
 
@@ -93,7 +101,7 @@
           <div class="text-center mt-4">
             <p class="text-muted small mb-0">
               <i class="bi bi-shield-lock me-1"></i>
-              Trang quản trị dành cho chủ nhà trọ
+              {{ selectedRole === 'tenant' ? 'Cổng thông tin dành cho người thuê' : 'Trang quản trị dành cho chủ nhà trọ' }}
             </p>
           </div>
         </div>
@@ -114,6 +122,12 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
+const selectedRole = ref('tenant')
+
+function selectRole(role) {
+  selectedRole.value = role
+  error.value = ''
+}
 
 async function handleSubmit() {
   // Reset error
@@ -128,9 +142,8 @@ async function handleSubmit() {
   loading.value = true
 
   try {
-    await login(username.value.trim(), password.value)
-    // Redirect to dashboard on success
-    router.push('/dashboard')
+    const result = await login(username.value.trim(), password.value, selectedRole.value)
+    router.push(result.role === 'tenant' ? '/tenant-portal' : '/dashboard')
   } catch (err) {
     const message =
       err.response?.data?.message ||
@@ -211,6 +224,25 @@ async function handleSubmit() {
 .alert-danger {
   border-radius: 0.5rem;
   font-size: 0.9rem;
+}
+
+.login-role-tabs {
+  background: #f1f3f5;
+  border-radius: .6rem;
+  padding: .25rem;
+}
+
+.login-role-tabs .nav-link {
+  color: #6c757d;
+  font-size: .9rem;
+  font-weight: 600;
+  border-radius: .45rem;
+}
+
+.login-role-tabs .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .12);
 }
 </style>
 

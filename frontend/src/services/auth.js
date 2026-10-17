@@ -2,6 +2,7 @@ import api from './api.js'
 
 const TOKEN_KEY = 'token'
 const USERNAME_KEY = 'username'
+const ROLE_KEY = 'role'
 
 /**
  * Login with username and password
@@ -9,12 +10,13 @@ const USERNAME_KEY = 'username'
  * @param {string} password
  * @returns {Promise<object>} { token, username }
  */
-export async function login(username, password) {
-  const response = await api.post('/auth/login', { username, password })
-  const { token } = response.data
+export async function login(username, password, expectedRole) {
+  const response = await api.post('/auth/login', { username, password, role: expectedRole })
+  const { token, role } = response.data
 
   localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(USERNAME_KEY, username)
+  localStorage.setItem(USERNAME_KEY, response.data.name || response.data.username || username)
+  localStorage.setItem(ROLE_KEY, role)
 
   return response.data
 }
@@ -33,6 +35,7 @@ export async function changePassword(currentPassword, newPassword) {
 export function logout() {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(USERNAME_KEY)
+  localStorage.removeItem(ROLE_KEY)
   window.location.href = '/login'
 }
 
@@ -50,4 +53,8 @@ export function isAuthenticated() {
  */
 export function getUsername() {
   return localStorage.getItem(USERNAME_KEY)
+}
+
+export function getRole() {
+  return localStorage.getItem(ROLE_KEY)
 }
