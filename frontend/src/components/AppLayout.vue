@@ -54,6 +54,12 @@
           </router-link>
         </li>
         <li>
+          <router-link to="/payment-history" class="nav-link text-white" :class="{ active: isActive('/payment-history') }" @click="closeSidebarOnMobile">
+            <i class="bi bi-clock-history me-2"></i>
+            Lịch sử thanh toán
+          </router-link>
+        </li>
+        <li>
           <router-link to="/expenses" class="nav-link text-white" :class="{ active: isActive('/expenses') }" @click="closeSidebarOnMobile">
             <i class="bi bi-receipt me-2"></i>
             Chi phí

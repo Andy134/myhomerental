@@ -5,6 +5,7 @@ import Rooms from '../views/Rooms.vue'
 import Users from '../views/Users.vue'
 import Contracts from '../views/Contracts.vue'
 import MonthlyBilling from '../views/MonthlyBilling.vue'
+import PaymentHistory from '../views/PaymentHistory.vue'
 import Expenses from '../views/Expenses.vue'
 import Settings from '../views/Settings.vue'
 
@@ -46,6 +47,12 @@ const routes = [
     path: '/monthly-billing',
     name: 'MonthlyBilling',
     component: MonthlyBilling,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/payment-history',
+    name: 'PaymentHistory',
+    component: PaymentHistory,
     meta: { requiresAuth: true }
   },
   {
